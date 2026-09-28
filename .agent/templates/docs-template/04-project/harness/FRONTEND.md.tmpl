@@ -1,0 +1,37 @@
+# FRONTEND.md
+
+This file defines stable frontend expectations so agents do not invent UI
+patterns unpredictably.
+
+Stack: **{{STACK}}**
+
+> Delete this file if the project has no user interface. Otherwise fill
+> the sections below at the first UI-touching slice and let it grow via
+> Harness Deltas at close.
+
+## UI Stack
+
+Fill in once the first UI-touching slice records the canonical paths,
+view/controller layout, and app configuration files.
+
+## UI Principles
+
+- Preserve UI patterns already established in the app.
+- Optimize for clear operational workflows over decorative layouts.
+- Keep interaction flows discoverable, restartable, and role-aware.
+- Accessibility checks are part of normal verification, not polish work.
+
+## Guardrails
+
+- Do not hard-code user-visible copy when an i18n key should be used.
+- Keep route, target, model, and service changes synchronized with the app manifest.
+- When changing a UI action, inspect the controller, view, fragment, formatter, utility code, and i18n keys together.
+- Preserve existing role and visibility checks unless the product/security spec changes them.
+- Record key user-facing states: empty, loading, success, error, retry.
+- Avoid broad UI rewrites; make scoped changes in the existing structure.
+
+## Verification Expectations
+
+- For controller/view changes, run the relevant baseline build and a local UI start path when feasible.
+- Capture browser/runtime evidence for critical user journeys in the relevant plan.
+- If visual regressions are common in a flow, standardize screenshot or DOM checks in the plan.

@@ -1,0 +1,14 @@
+schema_version: "1.0"
+schema: .agent/agents/harness/schemas/eval-rubric.schema.json
+agent: cap-business-analysis
+scale:
+  "0": missing-or-incorrect
+  "1": partial
+  "2": complete-with-evidence
+criteria:
+  - { id: CLARITY-CONTEXT, description: "Requirement, story, decision, and active-spec context is minimal, complete, and source referenced." }
+  - { id: CLARITY-SCOPE, description: "Scope, exclusions, ambiguity, and dependencies are explicit rather than inferred." }
+  - { id: CLARITY-AC, description: "Acceptance criteria are observable, testable, and traceable." }
+  - { id: CLARITY-CAP, description: "CAP/BTP-relevant service, authorization, data, integration, and error concerns are expressed at the correct functional level." }
+  - { id: CLARITY-BOUNDARY, description: "Protected baseline/handoff and lifecycle boundaries are respected." }
+

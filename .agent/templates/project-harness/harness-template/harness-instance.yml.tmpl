@@ -1,0 +1,29 @@
+harness:
+  installed: true
+  version: "{{HARNESS_VERSION}}"
+  profile: "{{HARNESS_PROFILE}}"
+  installed_on: "{{SETUP_DATE}}"
+  kit_root: "{{KIT_ROOT}}"
+
+project:
+  name: "{{PROJECT_NAME}}"
+  title: "{{PROJECT_TITLE}}"
+  code: "{{PROJECT_CODE}}"
+  type: "{{PROJECT_TYPE}}"
+  delivery_model: "{{DELIVERY_MODEL}}"
+  stack: "{{STACK_DESC}}"
+
+structure:
+  has_root_files: true
+  has_harness_config: true
+  has_docs_wiki: true
+  has_schemas: true
+  has_artifact_templates: true
+
+lifecycle:
+  status: initialized
+  next_action: bootstrap_project_context
+  notes: |
+    Harness shell is installed. No real task, sprint, requirement,
+    feature, user story, or session handoff exists yet. Run
+    bootstrap-project-context to capture the first real intake.

@@ -1,0 +1,60 @@
+# ARCHITECTURE.md — {{PROJECT_TITLE}}
+
+> **Status:** stub — fill at first `solution-architecture` slice close
+> **Owner:** Tech Lead
+> **Source of truth:** `docs/03-solution-design/01-solution-architecture.md`
+
+This file is a **top-level architectural sketch** for `{{PROJECT_NAME}}`.
+Detail lives under `docs/03-solution-design/`. This file exists to give
+new contributors and AI agents a one-screen orientation before they open
+the design folder.
+
+---
+
+## 1. What exists in the tree
+
+| Path  | Purpose          | Status |
+| ----- | ---------------- | ------ |
+| `srv/`| TBD              | tbd    |
+| `app/`| TBD              | tbd    |
+| `db/` | TBD              | tbd    |
+
+(Replace once the first slice closes. Do not invent paths that do not
+exist yet.)
+
+---
+
+## 2. Layer model
+
+```
+TBD — fill at first solution-architecture slice.
+```
+
+---
+
+## 3. Cross-cutting concerns
+
+| Concern         | Source of truth                                              |
+| --------------- | ------------------------------------------------------------ |
+| Authorization   | `docs/03-solution-design/07-security-authorization.md`       |
+| Data model      | `docs/03-solution-design/04-data-model.md`                   |
+| Integrations    | `docs/03-solution-design/05-integration-design.md`           |
+| API contracts   | `docs/03-solution-design/06-api-contract.md`                 |
+| Reliability     | `docs/06-release-go-live/08-reliability.md`                  |
+
+---
+
+## 4. Stack snapshot
+
+```
+{{STACK_DESC}}
+```
+
+---
+
+## 5. AI usage rules
+
+- Update this file **only** when the layer model changes.
+- Do not duplicate content from `docs/03-solution-design/`.
+- If a contradiction appears between this file and the source-of-truth
+  document, the source-of-truth wins; raise an open question.

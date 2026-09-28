@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "State completion contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "state", "objective", "success_policy", "required_checks", "allowed_termination"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "contract_id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "state": { "enum": ["intake", "clarify", "draft", "reviewed", "rework", "plan", "implement", "self-review", "unit-test", "verify"] },
+    "objective": { "type": "string", "minLength": 1 },
+    "success_policy": { "enum": ["all-required-checks-pass"] },
+    "required_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "evidence_required"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Z0-9-]+$" },
+          "description": { "type": "string" },
+          "evidence_required": { "type": "boolean" }
+        }
+      }
+    },
+    "allowed_termination": { "type": "array", "uniqueItems": true, "items": { "enum": ["COMPLETED", "COMPLETED_WITH_WARNINGS", "BLOCKED", "FAILED"] } },
+    "warning_policy": { "type": "string" }
+  }
+}
+

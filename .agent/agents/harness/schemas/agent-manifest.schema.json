@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "agent", "instructions", "shared_context", "capabilities", "supported_states", "skills", "contracts", "tools", "memory", "runtime", "loop", "observability", "governance"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "display_name", "version", "status", "owner", "functional_role", "governed_role", "description"],
+      "properties": {
+        "id": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+        "display_name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "status": { "enum": ["experimental", "active", "deprecated"] },
+        "owner": { "type": "string", "minLength": 1 },
+        "functional_role": { "type": "string", "minLength": 1 },
+        "governed_role": { "enum": ["Business Analyst", "Developer", "QA"] },
+        "description": { "type": "string" }
+      }
+    },
+    "instructions": { "type": "string" },
+    "shared_context": { "type": "array", "items": { "type": "string" } },
+    "capabilities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "supported_states": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["intake", "clarify", "draft", "reviewed", "rework", "plan", "implement", "self-review", "unit-test", "verify"] } },
+    "skills": { "type": "array", "items": { "type": "string" } },
+    "contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "output", "completion"],
+      "properties": {
+        "input": { "type": "string" },
+        "output": { "type": "string" },
+        "completion": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "string" } }
+      }
+    },
+    "tools": { "type": "object", "additionalProperties": false, "required": ["allow", "deny"], "properties": { "allow": { "type": "array", "items": { "type": "string" } }, "deny": { "type": "array", "items": { "type": "string" } } } },
+    "memory": { "type": "object" },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enforcement_mode", "max_attempts", "sandbox_profile", "concurrent_for_same_target", "require_scope_check", "budgets"],
+      "properties": {
+        "enforcement_mode": { "enum": ["manual-audited", "enforced"] },
+        "max_attempts": { "type": "integer", "minimum": 1 },
+        "sandbox_profile": { "type": "string" },
+        "concurrent_for_same_target": { "type": "boolean" },
+        "require_scope_check": { "type": "boolean" },
+        "budgets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enforcement", "max_tool_calls", "max_iterations"],
+          "properties": {
+            "enforcement": { "enum": ["observe", "hard"] },
+            "max_tool_calls": { "type": "integer", "minimum": 1 },
+            "max_iterations": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "loop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "progress_schema", "max_no_progress_iterations", "hard_iteration_limit", "continue_when", "stop_when"],
+      "properties": {
+        "strategy": { "const": "evidence-driven" },
+        "progress_schema": { "type": "string" },
+        "max_no_progress_iterations": { "type": "integer", "minimum": 1 },
+        "hard_iteration_limit": { "type": "integer", "minimum": 1 },
+        "continue_when": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "stop_when": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    },
+    "observability": { "type": "object", "required": ["emit"] },
+    "governance": { "type": "object", "required": ["may_modify_project", "may_propose_transition", "may_apply_transition"] }
+  }
+}
+

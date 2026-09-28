@@ -1,0 +1,34 @@
+publishing:
+  source_root: "docs"
+  output_root: "docs/99-published"
+
+  formats:
+    default: ["docx", "pdf"]
+
+  packages:
+    solution_design:
+      documents:
+        - "docs/03-solution-design/01-solution-architecture.md"
+        - "docs/03-solution-design/03-technical-design.md"
+        - "docs/03-solution-design/05-integration-design.md"
+        - "docs/03-solution-design/07-security-authorization.md"
+
+    requirements:
+      documents:
+        - "docs/02-requirements/01-product-requirement.md"
+        - "docs/02-requirements/06-user-stories.md"
+        - "docs/02-requirements/07-acceptance-criteria.md"
+
+    release:
+      documents:
+        - "docs/06-release-go-live/05-release-notes.md"
+        - "docs/06-release-go-live/02-deployment-guide.md"
+        - "docs/06-release-go-live/03-go-live-checklist.md"
+        - "docs/06-release-go-live/04-rollback-plan.md"
+
+    handover:
+      documents:
+        - "docs/07-handover-operation/01-user-guide.md"
+        - "docs/07-handover-operation/02-admin-guide.md"
+        - "docs/07-handover-operation/03-runbook.md"
+        - "docs/07-handover-operation/07-final-handover-checklist.md"

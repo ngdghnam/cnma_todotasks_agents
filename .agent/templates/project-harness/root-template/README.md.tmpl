@@ -1,0 +1,39 @@
+# {{PROJECT_TITLE}}
+
+> **Code:** {{PROJECT_CODE}}
+> **Type:** {{PROJECT_TYPE}}
+> **Stack:** {{STACK_DESC}}
+> **Delivery model:** {{DELIVERY_MODEL}}
+> **Harness version:** {{HARNESS_VERSION}}
+
+This repository hosts `{{PROJECT_NAME}}` and uses the AI-ready project
+harness installed from the AI Development Kit at `{{KIT_ROOT}}/`.
+
+## Entry points
+
+- AI agents: read [`AGENTS.md`](AGENTS.md)
+- Contributors: read [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Architecture sketch: [`ARCHITECTURE.md`](ARCHITECTURE.md)
+- Pre-action gates: [`CLEAN_STATE_CHECKLIST.md`](CLEAN_STATE_CHECKLIST.md)
+- Project knowledge: [`docs/`](docs/README.md)
+- Harness runtime config: [`.harness/`](.harness/)
+
+## Project state
+
+- Current state pointer: [`docs/00-project-control/current-state.yml`](docs/00-project-control/current-state.yml)
+- Active work: [`docs/00-project-control/active-work.md`](docs/00-project-control/active-work.md)
+- Project status: [`docs/00-project-control/project-status.md`](docs/00-project-control/project-status.md)
+
+## Next steps
+
+If you just ran `setup-project-harness`, the harness shell exists but
+contains **no real project content**. The next workflow to run is
+`bootstrap-project-context`.
+
+Routing matrix:
+
+| Situation                                  | Next workflow                |
+| ------------------------------------------ | ---------------------------- |
+| Greenfield project                         | `bootstrap-project-context`  |
+| Existing project with partial docs         | documentation audit          |
+| Existing code, no docs                     | `brownfield-discovery`       |

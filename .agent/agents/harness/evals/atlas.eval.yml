@@ -1,0 +1,19 @@
+schema_version: "1.0"
+schema: .agent/agents/harness/schemas/eval-rubric.schema.json
+agent: cap-solution
+scale:
+  "0": missing-or-incorrect
+  "1": partial
+  "2": complete-with-evidence
+criteria:
+  - id: ATLAS-CONTEXT
+    description: "Context is minimal, complete, frozen-baseline aware, and source referenced."
+  - id: ATLAS-MAPPING
+    description: "Supplied behavior is mapped through CAP data, service, UI, integration, authorization, and tests where applicable."
+  - id: ATLAS-SCOPE
+    description: "File scope and implementation sequence are concrete, minimal, and dependency aware."
+  - id: ATLAS-DRIFT
+    description: "Plan/source/baseline drift is flagged rather than silently rewritten."
+  - id: ATLAS-DONE
+    description: "Completion is based on the plan completion contract and evidence ledger."
+

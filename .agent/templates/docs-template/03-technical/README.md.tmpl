@@ -1,0 +1,62 @@
+# Technical Documentation
+
+> **Owner:** Tech Lead | **Audience:** Developers
+
+Technical documentation for building, maintaining, and extending
+{{PROJECT_TITLE}}. Stack: {{STACK}}.
+
+This is a **product-level** doc surface. Its content predates any project
+(see `docs/PRODUCT_BASELINE.md` for current status) and is updated through
+**Product Deltas** at slice close.
+
+## Architecture
+
+| Document | Description |
+|----------|-------------|
+| `architecture/overview.md` | High-level system architecture |
+| `architecture/data-flow.md` | How data moves through the system |
+
+## Implementation
+
+| Document | Description |
+|----------|-------------|
+| `implementation/getting-started.md` | Setup development environment |
+| `implementation/project-structure.md` | File/folder organization |
+| `implementation/adding-features.md` | How to add new features |
+
+## Reference
+
+| Document | Description |
+|----------|-------------|
+| `reference/api-reference.md` | Endpoint contracts |
+| `reference/configuration.md` | Environment settings |
+
+## Testing
+
+| Document | Description |
+|----------|-------------|
+| `testing/README.md` | Test strategy and how to run |
+
+## Relationship with 04-project
+
+`docs/04-project/ARCHITECTURE.md` records the **structural map of the
+working tree** for AI-agent consumption. The files here are the
+**audience-facing technical narrative** for developers.
+
+| Concern | Lives at |
+|---|---|
+| Layer roles + dependency directions for agent enforcement | `ARCHITECTURE.md` (repo root) |
+| Long-form architecture explanation for developers | `03-technical/architecture/overview.md` |
+| Forbidden patterns enforced at review | `CONSTRAINTS.md` (repo root) |
+| API contract narrative for integrators | `03-technical/reference/api-reference.md` |
+| ADRs | `03-technical/architecture/decisions/` (link target) and `docs/04-project/decisions/` (source) |
+
+## How this folder grows
+
+A Product Delta with target `03-technical/*` is proposed at:
+- Feature close stage when architecture, contract, or config changed
+- Concept Publish stage for cross-feature technical rules
+- ADR acceptance
+
+End-user how-to stays in 01-product. Business rules stay in 02-business.
+Implementation narrative for developers lives here.

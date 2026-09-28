@@ -1,0 +1,39 @@
+# Progress Log
+
+This file is sized for fast agent load. Keep it small and current.
+
+## Rules
+
+- "Current Verified State" is **rewritten in place** every session, never appended. It reflects `main` — global state, not per-assignee.
+- "Recent Sessions" keeps the **last 3 sessions max** per the project (not per assignee), each in the 6-bullet template below.
+- Every "Recent Sessions" entry must **name the slice it was about** (e.g. `feature-001`, `issue-002`, `concept-assignment`) and the assignee. Parallel work from different assignees on the same day is fine because each entry is unambiguously slice-tagged.
+- When the file crosses ~150 lines or 3 recent sessions, move the oldest session(s) verbatim into `docs/04-project/slices/99-progress-archive/YYYY-QN.md` and link from "Archive".
+- Per-slice narrative belongs in the matching plan under `docs/04-project/slices/02-exec-plans/features/active|completed/` (feature) or `docs/04-project/slices/02-exec-plans/issues/active|closed/` (issue) or `docs/04-project/harness/concepts/` (concept). `PROGRESS.md` references the plan; it does not duplicate it.
+- Every session uses this template - anything longer goes in the plan:
+  - Slice: (e.g. feature-001 / issue-002 / concept-assignment)
+  - Assignee:
+  - Goal:
+  - Done:
+  - Verified: (commands + outcomes)
+  - Risk:
+  - Next:
+
+## Current Verified State
+
+- Updated: {{BOOTSTRAP_DATE}}
+- Repo root: *fill in at first session*
+- Project: {{PROJECT_TITLE}}
+- Stack: {{STACK}}
+- Implementation status: greenfield. Harness bootstrapped on {{BOOTSTRAP_DATE}}. No slice has been opened yet.
+- Last green: — *none yet*
+- Active plan: — *none*
+- Current blockers: — *none*
+- Next best action: open the first slice (feature, concept, or issue) per `AGENTS.md` startup workflow.
+
+## Recent Sessions
+
+*none yet*
+
+## Archive
+
+- Older sessions: `docs/04-project/slices/99-progress-archive/`

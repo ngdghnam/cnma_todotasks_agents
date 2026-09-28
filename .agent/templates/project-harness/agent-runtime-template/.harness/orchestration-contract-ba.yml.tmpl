@@ -1,0 +1,84 @@
+schema: .agent/agents/harness/schemas/orchestration-contract.schema.json
+schema_version: "1.0"
+description: >
+  Project-owned orchestration policy for the BA lifecycle of a
+  feature_implementation. It routes functional-analysis work without storing
+  lifecycle state or duplicating transition evidence, gate, or role authority.
+lifecycle_source: docs/04-delivery/feature-implementations.yml
+transition_policy: .harness/transitions.yml
+routing_policy: .harness/agent-bindings.yml
+workflow: .agent/agents/harness/workflows/prepare-functional-spec.workflow.md
+advancement:
+  human_confirmation_required: true
+  runtime_may_apply_transition: false
+  agent_may_apply_transition: false
+states:
+  not-started:
+    agent: null
+    kind: boundary
+    note: Governed BA intake entry owns the transition to intake.
+  ready-for-build:
+    agent: null
+    kind: boundary
+    note: BA work is complete; the governed BA-to-DEV boundary owns the next action.
+  intake:
+    mode: intake
+    agent: cap-business-analysis
+    agent_may_propose: true
+    outcomes:
+      COMPLETED: { action: propose_transition, target_transition: ba_intake_to_clarify, requires: [execution_closed, completion_contract_satisfied] }
+      COMPLETED_WITH_WARNINGS: { action: propose_transition, target_transition: ba_intake_to_clarify, requires: [execution_closed, completion_contract_satisfied, warning_disposition_present] }
+      BLOCKED: { action: retain_state, require: [continuation, blocker_record] }
+      FAILED: { action: retain_state, require: [continuation], rerun: human }
+      PAUSED: { action: retain_state, require: [continuation] }
+  clarify:
+    mode: clarify
+    agent: cap-business-analysis
+    agent_may_propose: true
+    outcomes:
+      COMPLETED: { action: propose_transition, target_transition: ba_clarify_to_draft, requires: [execution_closed, completion_contract_satisfied] }
+      COMPLETED_WITH_WARNINGS: { action: propose_transition, target_transition: ba_clarify_to_draft, requires: [execution_closed, completion_contract_satisfied, warning_disposition_present] }
+      BLOCKED: { action: retain_state, require: [continuation, blocker_record] }
+      FAILED: { action: retain_state, require: [continuation], rerun: human }
+      PAUSED: { action: retain_state, require: [continuation] }
+  draft:
+    mode: draft
+    agent: cap-business-analysis
+    agent_may_propose: true
+    outcomes:
+      COMPLETED: { action: propose_transition, target_transition: ba_draft_to_reviewed, requires: [execution_closed, completion_contract_satisfied] }
+      COMPLETED_WITH_WARNINGS: { action: propose_transition, target_transition: ba_draft_to_reviewed, requires: [execution_closed, completion_contract_satisfied, warning_disposition_present] }
+      BLOCKED: { action: retain_state, require: [continuation, blocker_record] }
+      FAILED: { action: retain_state, require: [continuation], rerun: human }
+      PAUSED: { action: retain_state, require: [continuation] }
+  reviewed:
+    mode: reviewed
+    agent: cap-business-analysis
+    agent_may_propose: true
+    outcomes:
+      COMPLETED: { action: propose_transition, target_transition: ba_reviewed_to_ready_for_build, requires: [execution_closed, completion_contract_satisfied] }
+      COMPLETED_WITH_WARNINGS: { action: propose_transition, target_transition: ba_reviewed_to_ready_for_build, requires: [execution_closed, completion_contract_satisfied, warning_disposition_present] }
+      BLOCKED: { action: retain_state, require: [continuation, blocker_record] }
+      FAILED: { action: retain_state, require: [continuation], rerun: human }
+      PAUSED: { action: retain_state, require: [continuation] }
+  rework:
+    mode: rework
+    agent: cap-business-analysis
+    agent_may_propose: true
+    outcomes:
+      COMPLETED: { action: propose_transition, target_transition: ba_rework_to_clarify, requires: [execution_closed, completion_contract_satisfied] }
+      COMPLETED_WITH_WARNINGS: { action: propose_transition, target_transition: ba_rework_to_clarify, requires: [execution_closed, completion_contract_satisfied, warning_disposition_present] }
+      BLOCKED: { action: retain_state, require: [continuation, blocker_record] }
+      FAILED: { action: retain_state, require: [continuation], rerun: human }
+      PAUSED: { action: retain_state, require: [continuation] }
+semantic_routes:
+  enforced: false
+  resolver: agent-evidence-plus-human
+  routes:
+    material_product_ambiguity:
+      handling: Retain BA state and record a governed clarification; never invent business behavior.
+    baseline_rework_request:
+      target_transition: ba_rework_from_ready
+      authority: Project Manager
+      note: Coordinator-gated reopen; never an automatic action.
+

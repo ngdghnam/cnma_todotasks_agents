@@ -1,0 +1,76 @@
+# Clean State Checklist — {{PROJECT_TITLE}}
+
+Gates referenced from `.harness/gates.yml`. Every AI session and every
+pull request must clear the relevant block.
+
+---
+
+## start-of-session
+
+- [ ] Read `AGENTS.md`
+- [ ] Read `docs/00-project-control/current-state.yml`
+- [ ] Read `docs/00-project-control/active-work.md`
+- [ ] Read active task file (if any)
+- [ ] Confirm no uncommitted changes from a previous session are stranded
+- [ ] Confirm working branch matches `current-state.yml.current.active_branch`
+
+---
+
+## before-development
+
+- [ ] Feature status is `accepted` or later
+- [ ] User story links to an accepted feature and a source requirement
+- [ ] Acceptance criteria exist
+- [ ] Product Requirement maturity ≥ `draft`
+- [ ] Solution Architecture maturity ≥ `draft`
+- [ ] Blocking open questions are recorded in `open-question-log.md`
+- [ ] No development is starting from a `proposed` feature
+
+---
+
+## pre-pr
+
+- [ ] Impacted Documents in the task file are updated
+- [ ] Technical Design ≥ `draft` if technical behavior changed
+- [ ] API Contract updated if API changed
+- [ ] Data Model updated if schema changed
+- [ ] Security & Authorization updated if access changed
+- [ ] Release Notes updated if user-facing behavior changed
+- [ ] Document Completion Matrix reflects current state
+
+---
+
+## pre-release
+
+- [ ] All mandatory documents reach maturity required by
+      `.harness/document-fulfillment.yml`
+- [ ] Document Completion Matrix is current
+- [ ] Release Notes maturity is `accepted`
+- [ ] Deployment Guide maturity is `accepted`
+- [ ] Runbook maturity ≥ `draft`
+- [ ] Known issues are documented
+- [ ] Published package is prepared under `docs/99-published/`
+- [ ] Reliability document is updated
+- [ ] Golden journeys are defined
+- [ ] Health-check / verification procedure is documented
+
+---
+
+## pre-handover
+
+- [ ] User Guide maturity is `accepted`
+- [ ] Admin Guide maturity is `accepted` (if applicable)
+- [ ] Runbook maturity is `accepted`
+- [ ] Troubleshooting Guide maturity is `accepted`
+- [ ] Final Handover Checklist is completed
+
+---
+
+## end-of-session
+
+- [ ] `latest-session.md` updated
+- [ ] `active-work.md` updated
+- [ ] `progress-log.md` updated with today's entry
+- [ ] `document-completion-matrix.md` updated
+- [ ] `current-state.yml` updated
+- [ ] No fabricated content was added (anti-fiction check)

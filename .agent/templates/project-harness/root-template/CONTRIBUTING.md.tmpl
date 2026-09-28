@@ -1,0 +1,56 @@
+# Contributing to {{PROJECT_TITLE}}
+
+This project uses the AI-ready project harness. Contributions, whether
+from humans or AI agents, must follow the documented gates.
+
+---
+
+## 1. Before you start
+
+- Read `AGENTS.md` and `CLEAN_STATE_CHECKLIST.md`.
+- Open `docs/00-project-control/current-state.yml` to find the active
+  task. If you need a new task, follow `bootstrap-project-context` or
+  ask the Project Manager.
+- Verify you are on the correct branch
+  (`current-state.yml.current.active_branch`).
+
+---
+
+## 2. While you work
+
+- Create or update artifacts using the templates under
+  `.harness/templates/`.
+- Validate structured artifacts against `.harness/schemas/`.
+- Keep your changes scoped to the active task. Out-of-scope cleanups
+  go into a follow-up task, not the current PR.
+- Record open questions in
+  `docs/00-project-control/questions/open-question-log.md` rather than
+  guessing.
+
+---
+
+## 3. Before you open a PR
+
+Clear the `pre-pr` block of `CLEAN_STATE_CHECKLIST.md`.
+
+The reviewer will run `review-pr` (see `.harness/commands.yml`) which
+checks:
+
+- `gates.before_pull_request`
+- `quality.documentation`
+- `quality.technical`
+- `quality.anti_fiction`
+
+---
+
+## 4. End of session
+
+Run `end-session`. Do not leave handoff files stale.
+
+---
+
+## 5. Improving the harness itself
+
+The `{{KIT_ROOT}}/` directory is read-only during normal project work.
+Proposals to change harness rules, templates, or workflows go through
+`propose-harness-improvement` and require human approval.

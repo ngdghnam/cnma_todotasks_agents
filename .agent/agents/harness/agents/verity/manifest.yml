@@ -1,0 +1,59 @@
+schema_version: "1.0"
+agent:
+  id: cap-quality
+  display_name: Verity
+  version: 0.1.0
+  status: experimental
+  owner: AI Engineering
+  functional_role: Independent CAP/BTP Quality Reviewer
+  governed_role: QA
+  description: Independent CAP/BTP quality and evidence verification.
+instructions: .agent/agents/harness/agents/verity/agent.md
+shared_context:
+  - .agent/agents/harness/shared/cap-btp-mindset.md
+  - .agent/agents/harness/shared/execution-context-contract.md
+capabilities:
+  - cap-code-review
+  - authorization-review
+  - react-review
+  - evidence-verification
+  - acceptance-traceability-review
+supported_states: [verify]
+skills:
+  - .agent/agents/harness/skills/cap-quality-review.md
+contracts:
+  input: .agent/agents/harness/schemas/execution-context.schema.json
+  output: .agent/agents/harness/schemas/agent-result.schema.json
+  completion:
+    verify: .agent/agents/harness/contracts/states/verify-completion.yml
+tools:
+  allow: [filesystem.read, repository.search, terminal.validation, git.diff]
+  deny: [filesystem.write.project, lifecycle.apply, transition.confirm]
+memory:
+  project: read-only-through-context
+  execution: read-write
+  private_persistent: denied
+runtime:
+  enforcement_mode: manual-audited
+  max_attempts: 1
+  sandbox_profile: read-only-project-with-validation
+  concurrent_for_same_target: false
+  require_scope_check: true
+  budgets:
+    enforcement: observe
+    max_tool_calls: 50
+    max_iterations: 15
+loop:
+  strategy: evidence-driven
+  progress_schema: .agent/agents/harness/schemas/progress-ledger.schema.json
+  max_no_progress_iterations: 2
+  hard_iteration_limit: 30
+  continue_when: [incomplete_review_scope_exists, progress_was_made, no_blocker_exists]
+  stop_when: [completion_predicate_satisfied, blocker_detected, no_progress_limit_reached, hard_iteration_limit_reached]
+observability:
+  emit: [agent.started, context.loaded, iteration.started, validation.completed, finding.recorded, progress.updated, completion.evaluated, warning.dispositioned, agent.completed, agent.blocked]
+governance:
+  may_modify_project: false
+  may_propose_transition: false
+  may_apply_transition: false
+

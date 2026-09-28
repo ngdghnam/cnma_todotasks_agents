@@ -1,0 +1,24 @@
+schema_version: "1.0"
+contract_id: plan-completion
+state: plan
+objective: Produce an implementation-ready, traceable plan without redefining project scope.
+success_policy: all-required-checks-pass
+required_checks:
+  - id: PLAN-CONTEXT
+    description: Frozen baseline, governed handoff, live state, relevant design, and current source were resolved and reconciled.
+    evidence_required: true
+  - id: PLAN-SCOPE
+    description: Every supplied behavior is mapped to impacted CAP data, service, UI, integration, authorization, and test scope as applicable.
+    evidence_required: true
+  - id: PLAN-WORK
+    description: Developer-actionable work items, ordering, concrete file targets, and dependencies are complete.
+    evidence_required: true
+  - id: PLAN-VALIDATION
+    description: Required validation and acceptance evidence are defined for every supplied criterion.
+    evidence_required: true
+  - id: PLAN-CONFLICT
+    description: No unresolved baseline, architecture, external-contract, or scope blocker remains.
+    evidence_required: true
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: Warnings must not alter accepted behavior, security, architecture, or required validation.
+

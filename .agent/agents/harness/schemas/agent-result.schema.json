@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Workflow-first agent result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "agent", "display_name", "mode", "status", "summary", "progress_ref", "completion_contract_satisfied", "termination_reason", "source_refs", "outputs", "findings", "blockers", "warnings"],
+  "properties": {
+    "schema_version": { "enum": ["1.0", "1.1", "1.2", "1.3"] },
+    "execution_id": { "type": "string" },
+    "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+    "display_name": { "type": "string" },
+    "mode": { "enum": ["intake", "clarify", "draft", "reviewed", "rework", "plan", "implement", "self-review", "unit-test", "verify"] },
+    "status": { "enum": ["COMPLETED", "COMPLETED_WITH_WARNINGS", "PAUSED", "BLOCKED", "FAILED"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "progress_ref": { "type": "string" },
+    "completion_contract_satisfied": { "type": "boolean" },
+    "termination_reason": { "enum": ["completion-predicate-satisfied", "completed-with-warnings", "blocker-detected", "no-progress-limit-reached", "hard-iteration-limit-reached", "runtime-failure", "user-approved-checkpoint", "runtime-maintenance"] },
+    "source_refs": { "type": "array", "items": { "type": "string" } },
+    "outputs": { "type": "array", "items": { "type": "string" } },
+    "findings": { "type": "array", "items": { "type": "object", "required": ["severity", "description"], "properties": { "severity": { "enum": ["blocking", "warning", "note"] }, "location": { "type": "string" }, "description": { "type": "string" }, "evidence": { "type": "string" }, "next_action": { "type": "string" } } } },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "warning_disposition": { "type": ["array", "null"], "items": { "type": "object", "required": ["warning", "owner", "rationale", "follow_up_ref"], "properties": { "warning": { "type": "string" }, "owner": { "type": "string" }, "rationale": { "type": "string" }, "follow_up_ref": { "type": "string" } } } },
+    "continuation": { "type": ["object", "null"], "properties": { "why_stopped": { "type": "string" }, "next_work_item": { "type": "string" }, "prerequisites": { "type": "array", "items": { "type": "string" } }, "intended_files": { "type": "array", "items": { "type": "string" } }, "required_tests": { "type": "array", "items": { "type": "string" } }, "resume_command": { "type": "string" } } },
+    "changed_files": { "type": "array", "items": { "type": "string" } },
+    "validation": { "type": "array", "items": { "type": "object", "required": ["command", "outcome"], "properties": { "command": { "type": "string" }, "working_directory": { "type": "string" }, "outcome": { "enum": ["passed", "failed", "not-run", "not-applicable"] }, "evidence_path": { "type": "string" } } } },
+    "recommended_action": { "type": "string" },
+    "proposed_transition": { "type": ["object", "null"], "additionalProperties": false, "required": ["transition_id"], "properties": { "transition_id": { "type": "string" } } }
+  },
+  "allOf": [
+    { "if": { "properties": { "schema_version": { "enum": ["1.1", "1.2", "1.3"] } } }, "then": { "required": ["continuation", "warning_disposition"] } },
+    { "if": { "properties": { "status": { "const": "COMPLETED" } } }, "then": { "properties": { "completion_contract_satisfied": { "const": true }, "termination_reason": { "const": "completion-predicate-satisfied" }, "continuation": { "const": null } } } },
+    { "if": { "allOf": [{ "properties": { "status": { "const": "COMPLETED_WITH_WARNINGS" } } }, { "properties": { "schema_version": { "enum": ["1.1", "1.2", "1.3"] } } }] }, "then": { "properties": { "completion_contract_satisfied": { "const": true }, "termination_reason": { "const": "completed-with-warnings" }, "continuation": { "const": null }, "warnings": { "minItems": 1 }, "warning_disposition": { "minItems": 1 } }, "required": ["warning_disposition"] } },
+    { "if": { "properties": { "status": { "const": "PAUSED" } } }, "then": { "properties": { "completion_contract_satisfied": { "const": false }, "termination_reason": { "enum": ["user-approved-checkpoint", "runtime-maintenance"] }, "continuation": { "type": "object", "required": ["why_stopped", "next_work_item", "prerequisites", "intended_files", "required_tests", "resume_command"] } }, "required": ["continuation"] } },
+    { "if": { "allOf": [{ "properties": { "status": { "enum": ["BLOCKED", "FAILED"] } } }, { "properties": { "schema_version": { "enum": ["1.1", "1.2", "1.3"] } } }] }, "then": { "properties": { "completion_contract_satisfied": { "const": false }, "continuation": { "type": "object", "required": ["why_stopped", "next_work_item", "prerequisites", "intended_files", "required_tests", "resume_command"] } }, "required": ["continuation"] } },
+    { "if": { "allOf": [{ "properties": { "status": { "enum": ["BLOCKED", "FAILED", "PAUSED"] } } }, { "properties": { "schema_version": { "enum": ["1.1", "1.2", "1.3"] } } }] }, "then": { "properties": { "continuation": { "type": "object", "required": ["why_stopped", "next_work_item", "prerequisites", "intended_files", "required_tests", "resume_command"] } } } }
+  ]
+}
+

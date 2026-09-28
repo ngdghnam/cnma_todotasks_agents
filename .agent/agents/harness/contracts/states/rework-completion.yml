@@ -1,0 +1,12 @@
+schema_version: "1.0"
+contract_id: rework-completion
+state: rework
+objective: Bound an approved baseline rework before returning to clarification.
+success_policy: all-required-checks-pass
+required_checks:
+  - { id: BA-REWORK-SCOPE, description: The approved change reason and functional rework scope are captured., evidence_required: true }
+  - { id: BA-REWORK-DEV-IMPACT, description: Impact on the current DEV track and baseline consumers is recorded., evidence_required: true }
+  - { id: BA-REWORK-NEXT, description: Clarification work is actionable without silently changing a frozen baseline., evidence_required: true }
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: Warnings may not disguise a cross-track baseline conflict.
+

@@ -1,0 +1,192 @@
+schema: .agent/agents/harness/schemas/orchestration-contract.schema.json
+schema_version: "1.0"
+description: >
+  Project-owned orchestration policy for the DEV lifecycle of a
+  feature_implementation. It answers, in one place, "for this live DEV state and
+  this agent result status, what is allowed to happen next?" It is enforced
+  mechanically by the runner (.harness/scripts/agent-runtime.mjs). It never
+  stores lifecycle state, never restates transition evidence/gate/role rules,
+  and never applies a transition. Authority is unchanged:
+  lifecycle state -> docs/04-delivery/feature-implementations.yml,
+  transition rules -> .harness/transitions.yml,
+  routing         -> .harness/agent-bindings.yml.
+  Every target_transition below is a REFERENCE to a move id in
+  .harness/transitions.yml; the requires_evidence / requires_gate / requires_role
+  for that move live there and are the sole authority for confirming it.
+
+lifecycle_source: docs/04-delivery/feature-implementations.yml
+transition_policy: .harness/transitions.yml
+routing_policy: .harness/agent-bindings.yml
+workflow: .agent/agents/harness/workflows/implement-feature.workflow.md
+
+advancement:
+  # Fixed safe posture for the whole pilot. The runtime derives an eligible
+  # transition and prepares a proposal; only a human CONFIRM-TRANSITION mutates
+  # lifecycle. No agent and no runtime applies a transition.
+  human_confirmation_required: true
+  runtime_may_apply_transition: false
+  agent_may_apply_transition: false
+
+states:
+  # Boundary states carry no agent execution; the runner emits a clear
+  # "declared no-agent boundary" diagnostic instead of a missing-policy error.
+  not-started:
+    agent: null
+    kind: boundary
+    note: >
+      Governed planning entry (transitions.yml dev_start_plan) after BA
+      ready-for-build. No agent execution is routed here.
+  ready-for-delivery:
+    agent: null
+    kind: boundary
+    note: >
+      DEV track complete; the existing DEV->Delivery handoff process owns what
+      happens next. No agent execution is routed here.
+
+  plan:
+    mode: plan
+    agent: cap-solution
+    agent_may_propose: false        # mirrors atlas manifest may_propose_transition
+    outcomes:
+      COMPLETED:
+        action: propose_transition
+        target_transition: dev_plan_to_implement
+        requires: [execution_closed, completion_contract_satisfied]
+      COMPLETED_WITH_WARNINGS:
+        action: propose_transition
+        target_transition: dev_plan_to_implement
+        requires: [execution_closed, completion_contract_satisfied, warning_disposition_present]
+      BLOCKED:
+        action: retain_state
+        require: [continuation, blocker_record]
+      FAILED:
+        action: retain_state
+        require: [continuation]
+        rerun: human
+      PAUSED:
+        action: retain_state
+        require: [continuation]
+
+  implement:
+    mode: implement
+    agent: cap-implementation
+    agent_may_propose: true         # mirrors forge manifest may_propose_transition
+    outcomes:
+      COMPLETED:
+        action: propose_transition
+        target_transition: dev_implement_to_self_review
+        requires: [execution_closed, completion_contract_satisfied]
+      COMPLETED_WITH_WARNINGS:
+        action: propose_transition
+        target_transition: dev_implement_to_self_review
+        requires: [execution_closed, completion_contract_satisfied, warning_disposition_present]
+      BLOCKED:
+        action: retain_state
+        require: [continuation, blocker_record]
+      FAILED:
+        action: retain_state
+        require: [continuation]
+        rerun: human
+      PAUSED:
+        action: retain_state
+        require: [continuation]
+
+  self-review:
+    mode: self-review
+    agent: cap-implementation
+    agent_may_propose: true
+    outcomes:
+      COMPLETED:
+        action: propose_transition
+        target_transition: dev_self_review_to_unit_test
+        requires: [execution_closed, completion_contract_satisfied]
+      COMPLETED_WITH_WARNINGS:
+        action: propose_transition
+        target_transition: dev_self_review_to_unit_test
+        requires: [execution_closed, completion_contract_satisfied, warning_disposition_present]
+      BLOCKED:
+        action: retain_state
+        require: [continuation, blocker_record]
+      FAILED:
+        action: retain_state
+        require: [continuation]
+        rerun: human
+      PAUSED:
+        action: retain_state
+        require: [continuation]
+
+  unit-test:
+    mode: unit-test
+    agent: cap-implementation
+    agent_may_propose: true
+    outcomes:
+      COMPLETED:
+        action: propose_transition
+        target_transition: dev_unit_test_to_verify
+        requires: [execution_closed, completion_contract_satisfied]
+      COMPLETED_WITH_WARNINGS:
+        action: propose_transition
+        target_transition: dev_unit_test_to_verify
+        requires: [execution_closed, completion_contract_satisfied, warning_disposition_present]
+      BLOCKED:
+        action: retain_state
+        require: [continuation, blocker_record]
+      FAILED:
+        action: retain_state
+        require: [continuation]
+        rerun: human
+      PAUSED:
+        action: retain_state
+        require: [continuation]
+
+  verify:
+    mode: verify
+    agent: cap-quality
+    agent_may_propose: false        # mirrors verity manifest may_propose_transition
+    outcomes:
+      COMPLETED:
+        # Runtime derives this eligible transition; Verity does NOT attach a
+        # candidate. A human/Developer prepares the governed proposal and
+        # transitions.yml validates role/gate/evidence (before_pull_request).
+        action: propose_transition
+        target_transition: dev_verify_to_ready_for_delivery
+        requires: [execution_closed, completion_contract_satisfied]
+      COMPLETED_WITH_WARNINGS:
+        action: propose_transition
+        target_transition: dev_verify_to_ready_for_delivery
+        requires: [execution_closed, completion_contract_satisfied, warning_disposition_present]
+      BLOCKED:
+        action: retain_state
+        require: [continuation, blocker_record]
+      FAILED:
+        action: retain_state
+        require: [continuation]
+        rerun: human
+      PAUSED:
+        action: retain_state
+        require: [continuation]
+
+semantic_routes:
+  # These routes depend on professional judgment the runner cannot make from the
+  # result data model, so they are declared but NOT hard-enforced. The agent
+  # supplies evidence; a human decides.
+  enforced: false
+  resolver: agent-evidence-plus-human
+  routes:
+    baseline_conflict:
+      signal: BLOCKED result whose blocker is a frozen baseline/handoff conflict
+      target_transition: ba_rework_from_ready
+      authority: Project Manager
+      note: >
+        Coordinator-gated reopen (transitions.yml ba_rework_from_ready). Never an
+        automatic action; the agent returns BLOCKED with evidence and a human
+        coordinator decides.
+    out_of_scope_defect:
+      handling: >
+        Retain the current DEV state; record a follow-up / decision / risk via the
+        existing project-control commands. Not a transition.
+    in_scope_defect:
+      handling: >
+        Resolved inside the current state's work loop before the state can
+        complete. Not a transition.
+

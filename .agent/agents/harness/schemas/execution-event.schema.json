@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent execution event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "sequence", "timestamp", "event", "agent"],
+  "properties": {
+    "schema_version": { "enum": ["1.0", "1.1", "1.2", "1.3"] },
+    "execution_id": { "type": "string" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "event": { "enum": ["execution.prepared", "prompt.compiled", "context.loaded", "human.dispatch-confirmed", "agent.started", "agent.invoked", "iteration.started", "tool.called", "artifact.changed", "validation.completed", "progress.updated", "completion.evaluated", "finding.recorded", "permission.denied", "warning.dispositioned", "agent.completed", "agent.paused", "agent.blocked", "agent.failed", "session.closure-required", "session.closed", "gate.evaluated", "transition.proposed", "transition.reference-resolved", "iteration.opened", "iteration.resumed", "iteration.recorded", "iteration.abandoned", "iteration.rejected", "loop.progress-detected", "loop.no-progress", "loop.stop-required"] },
+    "agent": { "enum": ["runtime", "cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+    "step": { "type": "string" },
+    "iteration": { "type": "integer", "minimum": 0 },
+    "status": { "type": "string" },
+    "summary": { "type": "string" },
+    "artifact_ref": { "type": "string" },
+    "details": { "type": "object" }
+  }
+}
+

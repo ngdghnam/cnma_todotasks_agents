@@ -1,0 +1,30 @@
+schema_version: "1.0"
+contract_id: implement-completion
+state: implement
+objective: Complete the supplied implementation scope and make it ready for governed developer self-review.
+success_policy: all-required-checks-pass
+required_checks:
+  - id: IMPL-WORK
+    description: Every supplied implementation work item is completed or explicitly excluded by the approved scope.
+    evidence_required: true
+  - id: IMPL-AC
+    description: Every supplied acceptance criterion is mapped to implemented behavior and planned or implemented test evidence.
+    evidence_required: true
+  - id: IMPL-TESTS
+    description: Required technical tests are created or updated for positive, negative, authorization, and failure paths in scope.
+    evidence_required: true
+  - id: IMPL-VALIDATION
+    description: Applicable incremental validation commands complete without an unresolved in-scope failure.
+    evidence_required: true
+  - id: IMPL-SCOPE
+    description: Changed project files remain inside the effective write scope and protected artifacts are untouched.
+    evidence_required: true
+  - id: IMPL-NOTES
+    description: Required implementation notes contain all real deviations, decisions, failures, and reviewer-relevant facts.
+    evidence_required: true
+  - id: IMPL-BLOCKERS
+    description: No unresolved baseline, architecture, permission, or external-contract blocker remains.
+    evidence_required: true
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: A warning cannot hide failed validation, missing required behavior, authorization risk, or baseline deviation.
+

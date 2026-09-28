@@ -1,0 +1,21 @@
+schema_version: "1.0"
+contract_id: unit-test-completion
+state: unit-test
+objective: Execute the supplied technical test scope and record reproducible evidence.
+success_policy: all-required-checks-pass
+required_checks:
+  - id: TEST-SCOPE
+    description: All required tests from the supplied plan and acceptance mapping are selected and accounted for.
+    evidence_required: true
+  - id: TEST-EXECUTION
+    description: Each applicable test command is executed with working directory, exit status, and relevant output recorded.
+    evidence_required: true
+  - id: TEST-RESULT
+    description: No unresolved in-scope test failure remains and skipped or unavailable tests are explicitly justified.
+    evidence_required: true
+  - id: TEST-TRACE
+    description: Test results are mapped back to supplied work items and acceptance criteria.
+    evidence_required: true
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: Missing required tests or failed required tests are blockers, not warnings.
+

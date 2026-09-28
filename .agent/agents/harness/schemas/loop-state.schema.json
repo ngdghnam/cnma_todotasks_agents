@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Runtime-owned loop state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "committed_iteration_count", "next_attempt_number", "open_attempt", "no_progress_iterations", "hard_iteration_limit", "stop_required", "scope_checkpoint", "last_progress_sha256", "last_ledger_sha256"],
+  "properties": {
+    "schema_version": { "const": "1.3" },
+    "execution_id": { "type": "string" },
+    "committed_iteration_count": { "type": "integer", "minimum": 0 },
+    "next_attempt_number": { "type": "integer", "minimum": 1 },
+    "open_attempt": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["attempt_id", "opened_at", "agent"],
+      "properties": {
+        "attempt_id": { "type": "string" },
+        "opened_at": { "type": "string", "format": "date-time" },
+        "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+        "resumed_at": { "type": "string", "format": "date-time" },
+        "resumed_by": { "type": "string" }
+      }
+    },
+    "no_progress_iterations": { "type": "integer", "minimum": 0 },
+    "max_no_progress_iterations": { "type": "integer", "minimum": 1 },
+    "hard_iteration_limit": { "type": "integer", "minimum": 1 },
+    "stop_required": { "type": "boolean" },
+    "stop_reason": { "type": ["string", "null"] },
+    "scope_checkpoint": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "status", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "status": { "type": "string" },
+          "sha256": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "last_progress_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "last_ledger_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+  }
+}
+

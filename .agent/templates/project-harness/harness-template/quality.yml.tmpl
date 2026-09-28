@@ -1,0 +1,87 @@
+quality:
+  documentation:
+    require_document_id: true
+    require_owner: true
+    require_reviewer: true
+    require_status: true
+    require_maturity: true
+    require_traceability: true
+    no_empty_required_sections: true
+    tbd_requires_open_question: true
+    required_sections_must_have_content: true
+    document_maturity_required_for_gate: true
+    impacted_documents_must_be_updated: true
+
+  technical:
+    require_error_handling: true
+    require_authorization_check: true
+    require_test_evidence: true
+    require_release_note_for_user_facing_change: true
+
+  sap_btp:
+    require_destination_documentation: true
+    require_role_collection_mapping: true
+    require_environment_configuration_note: true
+    require_deployment_guide: true
+
+  anti_fiction:
+    require_source_refs_for_requirements: true
+    require_source_refs_for_features: true
+    require_source_refs_for_user_stories: true
+    unsupported_items_must_be_marked_as_proposed: true
+    assumptions_must_be_recorded: true
+    no_development_from_proposed_features: true
+    no_fake_initial_task_or_sprint: true
+
+  reliability:
+    require_verification_commands: true
+    require_golden_journeys: true
+    require_btp_runtime_checks: true
+    require_failure_modes: true
+    require_recovery_procedure: true
+
+  documentation_navigation:
+    require_readme_for_major_doc_folders: true
+    require_readme_for_control_subfolders: true
+    require_folder_purpose: true
+    require_main_documents_table: true
+    require_source_of_truth_section: true
+    require_ai_usage_rules: true
+
+  document_numbering:
+    require_numbered_phase_folders: true
+    require_numbered_main_documents: true
+    exclude_tracking_files_from_numbering: true
+    exclude_state_files_from_numbering: true
+    exclude_structured_source_files_from_numbering: true
+
+  folder_structure:
+    project_control_root_allowed_files:
+      - "README.md"
+      - "current-state.yml"
+      - "active-work.md"
+      - "project-status.md"
+    project_control_required_subfolders:
+      - "registers"
+      - "logs"
+      - "questions"
+      - "decisions"
+      - "risks"
+      - "quality"
+      - "archive"
+
+  memory_management:
+    max_latest_session_lines: 120
+    max_active_work_lines: 150
+    max_progress_log_lines: 500
+    max_transition_log_lines: 500
+    max_open_question_rows: 100
+    rotate_progress_log_by: "sprint"
+    rotate_transition_log_by: "sprint"
+    archive_session_handoffs_by: "sprint"
+    require_summary_before_archive: true
+    # Archived transition logs are immutable audit records: rotation may
+    # only move closed entries into the archive and must never rewrite
+    # them. The active transition-log.md keeps recent entries plus a
+    # pointer to each archived slice.
+    transition_log_archive_is_immutable: true

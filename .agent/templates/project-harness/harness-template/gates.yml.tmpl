@@ -1,0 +1,92 @@
+gates:
+  start_session:
+    checklist: "CLEAN_STATE_CHECKLIST.md#start-of-session"
+
+  before_feature_definition:
+    required:
+      - "Product Sense (docs/01-discovery/00-product-sense.md) is available or explicitly marked as incomplete"
+      - "Feature must align with Product Sense"
+      - "Feature must link to source requirement"
+      - "Unsupported ideas must be marked as proposed"
+
+  before_complex_work:
+    required:
+      - "Execution plan exists in docs/04-delivery/exec-plans/active/ for complex or risky work"
+      - "Execution plan links to accepted task or story"
+      - "Execution plan defines validation steps"
+      - "Execution plan defines required document updates"
+
+  before_development:
+    checklist: "CLEAN_STATE_CHECKLIST.md#before-development"
+    required:
+      - "Feature must be accepted (status >= accepted)"
+      - "User story must link to accepted feature"
+      - "User story must link to source requirement"
+      - "Acceptance criteria must exist"
+      - "Product Requirement maturity is at least draft"
+      - "Solution Architecture maturity is at least draft"
+      - "Blocking open questions are documented in open-question-log.md"
+      - "No development can start from unsupported assumptions"
+
+  before_sprint_commitment:
+    required:
+      - "All committed stories pass Definition of Ready"
+      - "All committed stories link to accepted features"
+      - "All committed stories link to source requirements"
+      - "All blocking open questions are resolved or explicitly accepted"
+
+  end_session:
+    checklist: "CLEAN_STATE_CHECKLIST.md#end-of-session"
+
+  before_pull_request:
+    checklist: "CLEAN_STATE_CHECKLIST.md#pre-pr"
+    required:
+      - "Impacted Documents in task file are updated"
+      - "Technical Design maturity is at least draft if technical behavior changed"
+      - "API Contract is updated if API changed"
+      - "Data Model is updated if schema changed"
+      - "Security Authorization is updated if access changed"
+      - "Release Notes are updated if user-facing behavior changed"
+      - "Document Completion Matrix reflects current state"
+
+  before_release:
+    checklist: "CLEAN_STATE_CHECKLIST.md#pre-release"
+    required:
+      - "All mandatory documents reach maturity required by .harness/document-fulfillment.yml"
+      - "Document Completion Matrix is updated"
+      - "Release Notes maturity is accepted"
+      - "Deployment Guide maturity is accepted"
+      - "Runbook maturity is at least draft"
+      - "Known issues are documented"
+      - "Published package is prepared in docs/99-published/"
+      - "Reliability document (docs/06-release-go-live/08-reliability.md) is updated"
+      - "Golden journeys are defined"
+      - "Health check or verification procedure is documented"
+      - "Known reliability risks are documented"
+
+  before_handover:
+    checklist: "CLEAN_STATE_CHECKLIST.md#pre-handover"
+    required:
+      - "User Guide maturity is accepted"
+      - "Admin Guide maturity is accepted if applicable"
+      - "Runbook maturity is accepted"
+      - "Troubleshooting Guide maturity is accepted"
+      - "Final Handover Checklist is completed"
+
+  before_project_template_release:
+    required:
+      - "Every major docs/ folder has README.md"
+      - "Every 00-project-control/ subfolder has README.md"
+      - "Main phase documents are numbered by reading flow"
+      - "Tracking/state/log files are not numbered"
+      - "00-project-control/ root contains only allowed current control files (README.md, current-state.yml, active-work.md, project-status.md)"
+      - "Project control logs are grouped into subfolders (registers/logs/questions/decisions/risks/quality/archive)"
+      - "Harness .harness/project.yml references are updated to the new paths"
+
+  harness_change:
+    required:
+      - "Change reason is documented in improvement-log.md"
+      - "Impact is described"
+      - "Affected harness files are listed"
+      - "Backward compatibility is checked"
+      - "Human approval is required (AI cannot self-approve)"

@@ -1,0 +1,40 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Document Entry"
+type: object
+required: [id, phase, name, source, owner, mandatory]
+properties:
+  id:
+    type: string
+    pattern: "^DOC-[0-9]{3,}$"
+  phase:
+    type: string
+    enum:
+      - "00-project-control"
+      - "01-discovery"
+      - "02-requirements"
+      - "03-solution-design"
+      - "04-delivery"
+      - "05-testing-uat"
+      - "06-release-go-live"
+      - "07-handover-operation"
+  name:
+    type: string
+  source:
+    type: string
+    description: "Repository-relative path to the markdown source."
+  owner:
+    type: string
+  mandatory:
+    type: boolean
+  publish_required:
+    type: boolean
+  output_formats:
+    type: array
+    items:
+      type: string
+      enum: ["docx", "pdf", "xlsx", "pptx", "html"]
+  signoff_required:
+    type: boolean
+  status:
+    type: string
+    enum: ["Not Started", "Draft", "In Progress", "In Review", "Approved", "Completed", "Blocked", "Obsolete"]

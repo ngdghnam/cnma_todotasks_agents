@@ -1,0 +1,143 @@
+# AGENTS.md — {{PROJECT_TITLE}}
+
+> **Project code:** {{PROJECT_CODE}}
+> **Project type:** {{PROJECT_TYPE}}
+> **Delivery model:** {{DELIVERY_MODEL}}
+> **Stack:** {{STACK_DESC}}
+> **Harness version:** {{HARNESS_VERSION}}
+> **Harness profile:** {{HARNESS_PROFILE}}
+> **Installed:** {{SETUP_DATE}}
+
+This file is the **AI agent contract** for `{{PROJECT_NAME}}`. Any AI agent
+working in this repository must read this file at the start of every
+session, before touching any project file.
+
+---
+
+## 1. Source of truth
+
+| Layer                 | Path                                       |
+| --------------------- | ------------------------------------------ |
+| Reusable kit          | `{{KIT_ROOT}}/` (read-only at runtime)     |
+| Project harness       | `.harness/` (project-owned)                |
+| Project knowledge     | `docs/` (project-owned)                    |
+| Current project state | `docs/00-project-control/current-state.yml`|
+| Active work pointer   | `docs/00-project-control/active-work.md`   |
+
+Rule: **AI never modifies `{{KIT_ROOT}}/`.** Improvements to the kit go
+through `propose-harness-improvement` (see `.harness/commands.yml`).
+
+---
+
+## 2. Reading order at session start
+
+1. `CLEAN_STATE_CHECKLIST.md` (start-of-session block)
+2. `docs/00-project-control/current-state.yml`
+3. `docs/00-project-control/active-work.md`
+4. The active task file referenced from `current-state.yml`
+5. `.harness/gates.yml` rules relevant to current phase
+6. `.harness/quality.yml` (anti-fiction, documentation, memory rules)
+
+If `current-state.yml.current.lifecycle_status` is `initialized` and
+`active_task` is null, the only allowed next action is to run
+`bootstrap-project-context`.
+
+---
+
+## 3. Working rules
+
+- Use templates from `.harness/templates/` when creating tasks, sprints,
+  handoffs, execution plans, ADRs, requirements, release notes, or test
+  cases.
+- Validate any structured artifact against the matching schema under
+  `.harness/schemas/`.
+- Update **only** the documents listed under "Impacted Documents" in the
+  active task file. If a missing document is needed, raise an open
+  question, do not invent it.
+- Respect `quality.anti_fiction`: no fake requirements, features, user
+  stories, sprints, tasks, or session handoffs.
+- Respect `quality.memory_management` thresholds. If a file exceeds its
+  limit, run `compact-project-memory`.
+
+### 3.1 Object lifecycle binding
+
+- Every task that declares a `workflow` must also declare a
+  `target_object: {type, id}`. The AI must read the matching workflow
+  entry in `.harness/workflows.yml` and verify all `exit_conditions`
+  against the target object **before** flipping the task to `Completed`.
+  If any condition is unmet, the AI refuses to close the task and
+  reports the specific unmet condition.
+- The AI must never edit an object's `maturity`, `status`, or
+  `signed_off` fields on its own initiative. Transitions are governed
+  by `.harness/transitions.yml`. The flow is:
+  1. AI proposes a transition with verbatim evidence quotes
+     (`path:line`) for every item listed under `requires_evidence`.
+  2. AI emits the exact `CONFIRM-TRANSITION ...` string to the user.
+  3. Only after the user replies with that string does the AI edit the
+     object's lifecycle fields and append the proposal + confirm line
+     to `docs/00-project-control/logs/transition-log.md`.
+- If the role recorded as `requires_role` for the transition differs
+  from the active session owner, the AI still proposes the transition
+  but tells the user that the listed role must be the confirmer.
+
+### 3.2 Multi-agent authority (implementation tracks)
+
+- A feature in implementation is tracked by a `feature_implementation`
+  record (`docs/04-delivery/feature-implementations.yml`) with three
+  role-owned tracks: **BA**, **DEV**, **Delivery**.
+- Each agent advances **only** the transitions in its role's
+  `may_advance` domain (`.harness/roles.yml`). BA owns `ba.*`, DEV owns
+  `dev.*`, the coordinator (**Project Manager**) owns `delivery.*`, the
+  parent `feature` lifecycle, and the BA rework reopen. Each agent writes
+  only its own subtree of the record; the coordinator owns the
+  cross-cutting fields (`feature`, `sprint`, `derived_status`).
+- Crossing a track boundary requires a **track-boundary handoff**
+  (`handoff_type: track-boundary`). DEV may start only after a BA→DEV
+  handoff exists; Delivery only after a DEV→Delivery handoff.
+- **Committed baseline:** when BA reaches `ready-for-build`, the
+  functional spec is committed and the BA→DEV handoff freezes it via
+  `baseline_ref` (spec docs + git ref) at a `version`. DEV builds against
+  that frozen version (`dev.baseline_version`) — never a live document.
+- **Rework:** changing a committed baseline is a distinct, coordinator-
+  gated event: `ready-for-build → rework` (Project Manager confirms),
+  then BA resumes `rework → clarify → … → ready-for-build`, which issues a
+  **new** handoff version. DEV re-syncs `baseline_version` to it.
+
+---
+
+## 4. End of session
+
+**Mandatory command: `end-session`.** Before reporting a session as done,
+every AI worker must execute the `end-session` contract in
+`.harness/commands.yml`. This applies to documentation, analysis, planning,
+implementation, review, and transition sessions; it is not limited to a
+runtime agent execution.
+
+Do not report completion until all applicable records are reconciled:
+
+- Always update `docs/00-project-control/logs/progress-log.md` with the
+  date, completed work, material blockers/decisions, and next governed action.
+- Always update `docs/04-delivery/session-handoffs/latest-session.md` with
+  an actionable continuation handoff.
+- When task, sprint, branch, feature, or next action changes, reconcile
+  `current-state.yml`, `active-work.md`, `project-status.md`, and
+  `product-progress.md`.
+- When a question, decision, risk, document registration, or maturity changes,
+  reconcile its authoritative register and applicable rendered view.
+- Append to `transition-log.md` only after an explicit, governed lifecycle
+  confirmation. A transition is never required for the progress log or latest
+  session handoff.
+
+For an agent execution, both the progress log and latest-session handoff must
+cite the exact execution ID before `close-session` may return it to a gate.
+
+---
+
+## 5. Routing
+
+- New greenfield project → `bootstrap-project-context`
+- Existing project with partial docs → documentation audit before bootstrap
+- Existing code, no docs → `brownfield-discovery`
+
+See `.agent/workflows/setup-project-harness.md` Phase 11 for the routing
+matrix.

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project agent bindings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "schema", "description", "catalog", "bindings", "runtime", "permissions", "evaluations"],
+  "properties": {
+    "schema_version": { "enum": ["1.0", "1.1", "1.2", "1.3"] },
+    "schema": { "const": ".agent/agents/harness/schemas/agent-bindings.schema.json" },
+    "description": { "type": "string" },
+    "catalog": {
+      "type": "object",
+      "required": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^cap-(business-analysis|solution|implementation|quality)$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["display_name", "governed_role", "manifest"],
+          "properties": { "display_name": { "type": "string" }, "governed_role": { "enum": ["Business Analyst", "Developer", "QA"] }, "manifest": { "type": "string" } }
+        }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature_implementation.ba.status", "feature_implementation.dev.status"],
+      "properties": {
+        "feature_implementation.ba.status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["not-started", "intake", "clarify", "draft", "reviewed", "ready-for-build", "rework"],
+          "properties": {
+            "not-started": { "type": "null" },
+            "intake": { "$ref": "#/$defs/binding" },
+            "clarify": { "$ref": "#/$defs/binding" },
+            "draft": { "$ref": "#/$defs/binding" },
+            "reviewed": { "$ref": "#/$defs/binding" },
+            "ready-for-build": { "type": "null" },
+            "rework": { "$ref": "#/$defs/binding" }
+          }
+        },
+        "feature_implementation.dev.status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["not-started", "plan", "implement", "self-review", "unit-test", "verify", "ready-for-delivery"],
+          "properties": {
+            "not-started": { "type": "null" },
+            "plan": { "$ref": "#/$defs/binding" },
+            "implement": { "$ref": "#/$defs/binding" },
+            "self-review": { "$ref": "#/$defs/binding" },
+            "unit-test": { "$ref": "#/$defs/binding" },
+            "verify": { "$ref": "#/$defs/binding" },
+            "ready-for-delivery": { "type": "null" }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enforcement_mode", "command", "workflow", "executions_root", "state_source", "prompt_assembly", "side_effect_policy", "gate_policy", "work_ledger_policy", "summary_contract", "evaluation_policy", "pilot_runtime", "runner", "manifest_schema", "execution_schema", "event_schema", "context_schema", "prompt_schema", "progress_schema", "result_schema", "evaluation_schema", "completion_schema", "rules"],
+      "properties": {
+        "enforcement_mode": { "enum": ["manual-audited", "human-gated-manual-audited"] },
+        "command": { "type": "string" },
+        "workflow": { "type": "string" },
+        "tracks": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ba": { "$ref": "#/$defs/trackRuntime" },
+            "dev": { "$ref": "#/$defs/trackRuntime" }
+          }
+        },
+        "adapter": { "type": "string", "description": "Legacy binding metadata. New bindings must not set it." },
+        "human_dispatch": { "type": "string" },
+        "executions_root": { "type": "string" },
+        "state_source": { "type": "string" },
+        "prompt_assembly": { "type": "string" },
+        "side_effect_policy": { "type": "string" },
+        "gate_policy": { "type": "string" },
+        "work_ledger_policy": { "type": "string" },
+        "loop_ledger_policy": { "type": "string" },
+        "summary_contract": { "type": "string" },
+        "evaluation_policy": { "type": "string" },
+        "pilot_runtime": { "type": "string" },
+        "runner": { "type": "string" },
+        "manifest_schema": { "type": "string" },
+        "execution_schema": { "type": "string" },
+        "event_schema": { "type": "string" },
+        "context_schema": { "type": "string" },
+        "prompt_schema": { "type": "string" },
+        "progress_schema": { "type": "string" },
+        "result_schema": { "type": "string" },
+        "evaluation_schema": { "type": "string" },
+        "completion_schema": { "type": "string" },
+        "orchestration_contract": { "type": "string" },
+        "orchestration_schema": { "type": "string" },
+        "loop_state_schema": { "type": "string" },
+        "loop_ledger_record_schema": { "type": "string" },
+        "iteration_candidate_schema": { "type": "string" },
+        "rules": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution_memory_write", "project_write_from_context_only", "generated_write", "protected"],
+      "properties": {
+        "execution_memory_write": { "type": "string" },
+        "project_write_from_context_only": { "type": "boolean" },
+        "generated_write": { "type": "array", "items": { "type": "string" } },
+        "protected": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "carry_forward": { "type": "object" },
+    "evaluations": { "type": "object", "additionalProperties": { "type": "string" } }
+  },
+  "allOf": [
+    { "if": { "properties": { "schema_version": { "const": "1.1" } } }, "then": { "properties": { "runtime": { "required": ["human_dispatch"], "not": { "required": ["adapter"] } } } } },
+    { "if": { "properties": { "schema_version": { "enum": ["1.0", "1.1"] } } }, "then": { "required": ["carry_forward"] } },
+    { "if": { "properties": { "schema_version": { "const": "1.2" } } }, "then": { "not": { "required": ["carry_forward"] }, "properties": { "runtime": { "required": ["human_dispatch", "orchestration_contract", "orchestration_schema"], "not": { "required": ["adapter"] } } } } },
+    { "if": { "properties": { "schema_version": { "const": "1.3" } } }, "then": { "not": { "required": ["carry_forward"] }, "properties": { "runtime": { "required": ["human_dispatch", "tracks", "orchestration_contract", "orchestration_schema", "loop_ledger_policy", "loop_state_schema", "loop_ledger_record_schema", "iteration_candidate_schema"], "not": { "required": ["adapter"] }, "properties": { "tracks": { "required": ["ba", "dev"] } } } } } }
+  ],
+  "$defs": {
+    "binding": { "type": "object", "additionalProperties": false, "required": ["agent", "mode"], "properties": { "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] }, "mode": { "enum": ["intake", "clarify", "draft", "reviewed", "rework", "plan", "implement", "self-review", "unit-test", "verify"] } } },
+    "trackRuntime": { "type": "object", "additionalProperties": false, "required": ["workflow", "orchestration_contract"], "properties": { "workflow": { "type": "string" }, "orchestration_contract": { "type": "string" } } }
+  }
+}
+

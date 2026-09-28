@@ -1,0 +1,20 @@
+{
+  "project": "{{PROJECT_NAME}}",
+  "updated": "{{BOOTSTRAP_DATE}}",
+  "status_rules": {
+    "not_started": "Feature has not been started.",
+    "in_progress": "The one feature currently being worked on.",
+    "blocked": "Work cannot continue without a documented external input or fix.",
+    "passing": "Verification passed and evidence is recorded."
+  },
+  "rules": [
+    "Exactly one feature is in_progress per assignee at a time. Multiple assignees may each have one in-flight feature in parallel.",
+    "Each row carries an optional 'assignee' field (string). When omitted, the row is treated as unassigned.",
+    "Each row carries an optional 'fix_history' array of one-line entries { id, category, date } appended when an issue against this feature closes (see docs/04-project/harness/engineering/issue-workflow.md).",
+    "A feature entry is added only after the user clarifies it. The harness does not pre-declare features.",
+    "Each feature entry is created at the start of its slice and links to its product spec section and active plan.",
+    "An entry can be flipped to passing only after every box in CLEAN_STATE_CHECKLIST.md is green and a golden journey is recorded in docs/04-project/harness/RELIABILITY.md.",
+    "Evidence entries take one of two shapes. Command shape (default): { date, command, result, details }. Runtime shape (required at least once when the plan declares a runtime surface): { date, surface, start_signal, ready_signal, exercised_path, observed_result, shutdown, side_effects_cleared, details? }."
+  ],
+  "features": []
+}

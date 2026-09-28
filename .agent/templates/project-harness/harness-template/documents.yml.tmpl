@@ -1,0 +1,294 @@
+documents:
+  - id: "DOC-001"
+    phase: "01-discovery"
+    name: "Project Brief"
+    source: "docs/01-discovery/01-project-brief.md"
+    owner: "Project Manager"
+    reviewer: "Sponsor"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_development
+      - before_release
+
+  - id: "DOC-002"
+    phase: "01-discovery"
+    name: "Business Context"
+    source: "docs/01-discovery/02-business-context.md"
+    owner: "Business Analyst"
+    reviewer: "Project Manager"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: false
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_development
+
+  - id: "DOC-010"
+    phase: "02-requirements"
+    name: "Product Requirement"
+    source: "docs/02-requirements/01-product-requirement.md"
+    owner: "Business Analyst"
+    reviewer: "Product Owner"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: true
+    signed_off: false
+    required_for_gate:
+      - before_development
+      - before_release
+
+  - id: "DOC-011"
+    phase: "02-requirements"
+    name: "User Stories"
+    source: "docs/02-requirements/06-user-stories.md"
+    owner: "Business Analyst"
+    reviewer: "Product Owner"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: false
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_development
+
+  - id: "DOC-012"
+    phase: "02-requirements"
+    name: "Acceptance Criteria"
+    source: "docs/02-requirements/07-acceptance-criteria.md"
+    owner: "Business Analyst"
+    reviewer: "QA"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: false
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_development
+
+  - id: "DOC-020"
+    phase: "03-solution-design"
+    name: "Solution Architecture"
+    source: "docs/03-solution-design/01-solution-architecture.md"
+    owner: "Tech Lead"
+    reviewer: "Solution Architect"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: true
+    signed_off: false
+    required_for_gate:
+      - before_development
+      - before_release
+
+  - id: "DOC-021"
+    phase: "03-solution-design"
+    name: "Technical Design"
+    source: "docs/03-solution-design/03-technical-design.md"
+    owner: "Tech Lead"
+    reviewer: "Solution Architect"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_pull_request
+      - before_release
+
+  - id: "DOC-022"
+    phase: "03-solution-design"
+    name: "Data Model"
+    source: "docs/03-solution-design/04-data-model.md"
+    owner: "Tech Lead"
+    reviewer: "Solution Architect"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: false
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_pull_request
+
+  - id: "DOC-023"
+    phase: "03-solution-design"
+    name: "Integration Design"
+    source: "docs/03-solution-design/05-integration-design.md"
+    owner: "Tech Lead"
+    reviewer: "Solution Architect"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_pull_request
+      - before_release
+
+  - id: "DOC-024"
+    phase: "03-solution-design"
+    name: "Security & Authorization"
+    source: "docs/03-solution-design/07-security-authorization.md"
+    owner: "Tech Lead"
+    reviewer: "Security Officer"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx"]
+    signoff_required: true
+    signed_off: false
+    required_for_gate:
+      - before_pull_request
+      - before_release
+
+  - id: "DOC-030"
+    phase: "05-testing-uat"
+    name: "Test Strategy"
+    source: "docs/05-testing-uat/01-test-strategy.md"
+    owner: "QA"
+    reviewer: "Project Manager"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: false
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_release
+
+  - id: "DOC-031"
+    phase: "05-testing-uat"
+    name: "UAT Script"
+    source: "docs/05-testing-uat/05-uat-script.md"
+    owner: "Business Analyst"
+    reviewer: "Product Owner"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx"]
+    signoff_required: true
+    signed_off: false
+    required_for_gate:
+      - before_release
+
+  - id: "DOC-040"
+    phase: "06-release-go-live"
+    name: "Release Notes"
+    source: "docs/06-release-go-live/05-release-notes.md"
+    owner: "Project Manager"
+    reviewer: "Product Owner"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_release
+
+  - id: "DOC-041"
+    phase: "06-release-go-live"
+    name: "Deployment Guide"
+    source: "docs/06-release-go-live/02-deployment-guide.md"
+    owner: "Tech Lead"
+    reviewer: "Project Manager"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_release
+
+  - id: "DOC-047"
+    phase: "06-release-go-live"
+    name: "Reliability"
+    source: "docs/06-release-go-live/08-reliability.md"
+    owner: "Tech Lead"
+    reviewer: "Support Lead"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_release
+
+  - id: "DOC-050"
+    phase: "07-handover-operation"
+    name: "User Guide"
+    source: "docs/07-handover-operation/01-user-guide.md"
+    owner: "Business Analyst"
+    reviewer: "Product Owner"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: true
+    signed_off: false
+    required_for_gate:
+      - before_handover
+
+  - id: "DOC-051"
+    phase: "07-handover-operation"
+    name: "Admin Guide"
+    source: "docs/07-handover-operation/02-admin-guide.md"
+    owner: "Tech Lead"
+    reviewer: "Project Manager"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx", "pdf"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_handover
+
+  - id: "DOC-052"
+    phase: "07-handover-operation"
+    name: "Runbook"
+    source: "docs/07-handover-operation/03-runbook.md"
+    owner: "Tech Lead"
+    reviewer: "Support Lead"
+    status: "not-started"
+    maturity: "stub"
+    mandatory: true
+    publish_required: true
+    output_formats: ["docx"]
+    signoff_required: false
+    signed_off: false
+    required_for_gate:
+      - before_handover

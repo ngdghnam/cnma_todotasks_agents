@@ -1,0 +1,76 @@
+workflows:
+  feature:
+    required_inputs:
+      - requirement_id
+      - user_story
+      - acceptance_criteria
+      - impacted_modules
+    required_docs:
+      - "docs/02-requirements/06-user-stories.md"
+      - "docs/03-solution-design/03-technical-design.md"
+    required_updates_when_changed:
+      api:
+        - "docs/03-solution-design/06-api-contract.md"
+      data_model:
+        - "docs/03-solution-design/04-data-model.md"
+      authorization:
+        - "docs/03-solution-design/07-security-authorization.md"
+      release_scope:
+        - "docs/06-release-go-live/05-release-notes.md"
+
+  bugfix:
+    required_inputs:
+      - defect_id
+      - root_cause
+      - impacted_modules
+    required_docs:
+      - "docs/04-delivery/03-defect-log.md"
+    required_updates_when_changed:
+      release_scope:
+        - "docs/06-release-go-live/05-release-notes.md"
+
+  documentation:
+    target_object_type: document
+    required_inputs:
+      - document_id
+      - reason
+    required_docs:
+      - "docs/00-project-control/registers/document-register.md"
+    # Conditions that the target document must satisfy before the task
+    # that carries this workflow may transition to Completed. The AI
+    # evaluates these against the document's entry in
+    # .harness/documents.yml (see .harness/transitions.yml for how
+    # maturity is allowed to advance). If any condition fails, the AI
+    # must refuse to mark the task Completed and report which condition
+    # is unmet.
+    exit_conditions:
+      - "target.maturity in [accepted]"
+      - "if target.signoff_required == true then target.signed_off == true"
+
+  refactoring:
+    required_inputs:
+      - scope
+      - rationale
+    required_docs:
+      - "docs/03-solution-design/03-technical-design.md"
+
+  release:
+    required_inputs:
+      - release_version
+      - scope_list
+    required_docs:
+      - "docs/06-release-go-live/01-release-plan.md"
+      - "docs/06-release-go-live/05-release-notes.md"
+      - "docs/06-release-go-live/02-deployment-guide.md"
+      - "docs/06-release-go-live/04-rollback-plan.md"
+      - "docs/05-testing-uat/07-release-readiness.md"
+
+  handover:
+    required_inputs:
+      - handover_target
+      - scope
+    required_docs:
+      - "docs/07-handover-operation/01-user-guide.md"
+      - "docs/07-handover-operation/02-admin-guide.md"
+      - "docs/07-handover-operation/03-runbook.md"
+      - "docs/07-handover-operation/07-final-handover-checklist.md"

@@ -1,0 +1,64 @@
+schema_version: "1.0"
+agent:
+  id: cap-business-analysis
+  display_name: Clarity
+  version: 0.1.0
+  status: experimental
+  owner: AI Engineering
+  functional_role: SAP BTP/CAP Functional Analysis Specialist
+  governed_role: Business Analyst
+  description: Evidence-based functional specification, clarification, and build-readiness work.
+instructions: .agent/agents/harness/agents/clarity/agent.md
+shared_context:
+  - .agent/agents/harness/shared/cap-btp-mindset.md
+  - .agent/agents/harness/shared/execution-context-contract.md
+capabilities:
+  - requirements-context-resolution
+  - functional-specification-authoring
+  - acceptance-criteria-analysis
+  - clarification-and-scope-management
+  - ba-dev-build-readiness
+supported_states: [intake, clarify, draft, reviewed, rework]
+skills:
+  - .agent/agents/harness/skills/resolve-functional-context.md
+  - .agent/agents/harness/skills/functional-specification-governance.md
+contracts:
+  input: .agent/agents/harness/schemas/execution-context.schema.json
+  output: .agent/agents/harness/schemas/agent-result.schema.json
+  completion:
+    intake: .agent/agents/harness/contracts/states/intake-completion.yml
+    clarify: .agent/agents/harness/contracts/states/clarify-completion.yml
+    draft: .agent/agents/harness/contracts/states/draft-completion.yml
+    reviewed: .agent/agents/harness/contracts/states/reviewed-completion.yml
+    rework: .agent/agents/harness/contracts/states/rework-completion.yml
+tools:
+  allow: [filesystem.read, filesystem.write, repository.search, git.diff]
+  deny: [lifecycle.apply, transition.confirm, baseline.freeze, handoff.issue]
+memory:
+  project: read-only-through-context
+  execution: read-write
+  private_persistent: denied
+runtime:
+  enforcement_mode: manual-audited
+  max_attempts: 1
+  sandbox_profile: active-functional-spec-only
+  concurrent_for_same_target: false
+  require_scope_check: true
+  budgets:
+    enforcement: observe
+    max_tool_calls: 30
+    max_iterations: 12
+loop:
+  strategy: evidence-driven
+  progress_schema: .agent/agents/harness/schemas/progress-ledger.schema.json
+  max_no_progress_iterations: 2
+  hard_iteration_limit: 30
+  continue_when: [incomplete_work_exists, progress_was_made, no_blocker_exists]
+  stop_when: [completion_predicate_satisfied, blocker_detected, no_progress_limit_reached, hard_iteration_limit_reached]
+observability:
+  emit: [agent.started, context.loaded, iteration.started, progress.updated, finding.recorded, completion.evaluated, agent.completed, agent.blocked]
+governance:
+  may_modify_project: true
+  may_propose_transition: true
+  may_apply_transition: false
+

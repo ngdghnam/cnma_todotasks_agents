@@ -1,0 +1,67 @@
+# RELIABILITY.md
+
+This file defines how the system proves it is healthy and restartable.
+
+Stack: **{{STACK}}**
+
+## Standard Paths
+
+Fill in once the first slice lands and the standard run/verify commands
+are real. Until then, this section is *intentionally empty* — the first
+slice's *clarify* stage records the bootstrap, verify, and build paths
+here as a Harness Delta at close.
+
+Suggested rows to fill (delete the ones that do not apply to this stack):
+
+- Bootstrap: `<command>`
+- Install dependencies: `<command>`
+- Baseline build: `<command>`
+- Test harness verification: `<command>`
+- Full build: `<command>`
+- Local start: `<command>`
+- Frontend start (if applicable): `<command>`
+
+## Current Baseline
+
+| Command | Status | Last Run | Notes |
+|---|---|---|---|
+| — | — | — | *none yet* |
+
+## Required Runtime Signals
+
+- Startup must surface service-registration / boot failures clearly.
+- User-visible flows must show error states for recoverable failures.
+- Background jobs must log start, completion, and failure status.
+- Additional signals are added to this list only after a slice introduces a flow that requires them.
+
+## Golden Journeys
+
+This section is a **table of contents**. One row per user-visible feature
+journey; one-line behavior summary; full body lives in
+`docs/04-project/slices/03-reliability-journeys/<feature-slug>.md`. If a cell needs more than one
+line, the detail belongs in the linked file — not here.
+
+| Feature | Behavior (one line) | Journey Doc |
+|---|---|---|
+| — | *none yet* | — |
+
+### Journey Authoring Rules
+
+Each user-visible feature adds a row above during *clarify* and a journey doc
+under `docs/04-project/slices/03-reliability-journeys/`. The journey doc must name:
+
+- the user-visible behavior being verified,
+- the repeatable command(s) or UI path that exercises it,
+- the failure signal that proves regression,
+- the current evidence (automated + runtime).
+
+A feature cannot be marked `passing` in `feature_list.json` without its
+journey doc existing, linked from the row above, and exercised in the closing
+session.
+
+## Reliability Rules
+
+- No feature is complete if the system cannot restart cleanly afterward, unless the restart blocker is documented as unrelated baseline debt.
+- Runtime failures should be diagnosable from repo-local commands and logs.
+- If a repeated failure mode appears, add a benchmark, test, or guardrail for it.
+- Cleanup is part of reliability, not a separate concern.

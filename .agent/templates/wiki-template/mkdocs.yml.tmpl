@@ -1,0 +1,87 @@
+site_name: {{PROJECT_TITLE}}
+site_description: {{PRODUCT_JTBD}}
+site_dir: ../dist/wiki
+docs_dir: docs
+
+theme:
+  name: material
+  custom_dir: overrides
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+nav:
+  - Overview:
+      - What it is: 01-product/vision.md
+      - Who it's for: 01-product/personas.md
+      - Success metrics: 01-product/success-metrics.md
+  - Features and Roadmap:
+      - Feature catalog: 01-product/product-roadmap.md
+      - Scope: 01-product/scope-and-non-goals.md
+  - User Guide:
+      - Quick start: 01-product/quick-start.md
+      - User manual: 01-product/user-manual/
+      - Admin guide: 01-product/admin-guide/
+      - FAQ: 01-product/faq.md
+  - Releases:
+      - History: 05-releases/
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+# Strict mode off — missing nav entries are tolerated (Sprint 0 may not have filled every link yet)
+strict: false
+
+# Validation: warn on broken internal links instead of hard fail (PO can fix iteratively)
+validation:
+  links:
+    not_found: warn
+    absolute_links: ignore
+    unrecognized_links: warn

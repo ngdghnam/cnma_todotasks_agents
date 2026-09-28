@@ -1,0 +1,35 @@
+# 00-project-control/
+
+The control center for `{{PROJECT_NAME}}`. Holds **live state** and
+**tracking logs**. Files here are read at the start of every AI session.
+
+## Allowed files at this root
+
+| File                | Purpose                                  |
+| ------------------- | ---------------------------------------- |
+| `README.md`         | This file                                |
+| `current-state.yml` | Single source of truth for project state |
+| `active-work.md`    | Human-readable pointer to active work    |
+| `project-status.md` | Stakeholder-facing status summary        |
+
+No other file is allowed at this root. Everything else lives in a
+subfolder.
+
+## Subfolders
+
+| Folder       | Purpose                                            |
+| ------------ | -------------------------------------------------- |
+| `registers/` | Document register + completion matrix              |
+| `logs/`      | Progress log + per-sprint archives                 |
+| `questions/` | Open-question log + per-question files + resolved  |
+| `decisions/` | Decision log                                       |
+| `risks/`     | Risk and assumption log                            |
+| `quality/`   | Quality score, improvement log, retrospectives     |
+| `archive/`   | Archived items moved out of active tracking        |
+
+## AI usage rules
+
+- `current-state.yml` is read-write — keep it small and current.
+- Tracking files are **not numbered**.
+- Run `compact-project-memory` when files exceed
+  `.harness/quality.yml.memory_management` thresholds.

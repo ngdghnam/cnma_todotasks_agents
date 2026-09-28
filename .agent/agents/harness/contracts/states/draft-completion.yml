@@ -1,0 +1,12 @@
+schema_version: "1.0"
+contract_id: draft-completion
+state: draft
+objective: Produce a reviewable active functional specification.
+success_policy: all-required-checks-pass
+required_checks:
+  - { id: BA-DRAFT-TRACEABILITY, description: "Requirements and stories are traceable into functional behavior and acceptance criteria.", evidence_required: true }
+  - { id: BA-DRAFT-BEHAVIOR, description: "Roles, validation, errors, data/integration behavior, and exclusions are specified as applicable.", evidence_required: true }
+  - { id: BA-DRAFT-REVIEW, description: The active functional specification is internally consistent and ready for substantive review., evidence_required: true }
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: Warnings may not alter approved behavior or conceal missing acceptance evidence.
+

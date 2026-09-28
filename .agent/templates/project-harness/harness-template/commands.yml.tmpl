@@ -1,0 +1,354 @@
+commands:
+  bootstrap-project-context:
+    description: "Run the first real intake when the harness is initialized but no project content exists."
+    preconditions:
+      - "docs/00-project-control/current-state.yml.current.active_task is null"
+      - "real discovery input has been provided by the user/customer"
+    steps:
+      - "capture source input under docs/01-discovery/"
+      - "create the first real task referencing the captured input"
+      - "update docs/00-project-control/current-state.yml"
+
+  prepare-feature:
+    description: "Analyze requirement and prepare implementation context."
+    read:
+      - "docs/00-project-control/current-state.yml"
+      - "docs/00-project-control/active-work.md"
+      - "docs/02-requirements/features.yml"
+      - "docs/02-requirements/user-stories.yml"
+      - "docs/03-solution-design/03-technical-design.md"
+    output:
+      - "implementation plan"
+      - "open questions"
+      - "required document updates"
+
+  prepare-functional-spec:
+    description: "Create or update a BA functional spec for a governed feature implementation record."
+    read:
+      - "docs/04-delivery/feature-implementations.yml"
+      - "docs/02-requirements/features.yml"
+      - "docs/02-requirements/user-stories.yml"
+      - "docs/02-requirements/07-acceptance-criteria.md"
+      - "docs/03-solution-design/"
+    output:
+      - "docs/04-delivery/functional-specs/active/<spec-id>.md"
+
+  freeze-functional-baseline:
+    description: "Freeze a reviewed BA functional spec into a build baseline before BA->DEV handoff."
+    preconditions:
+      - "feature_implementation.ba.status is reviewed"
+      - "acceptance criteria are complete and testable"
+      - "open clarifications are resolved or tracked"
+    output:
+      - "docs/04-delivery/functional-specs/baselines/<spec-id>-v<version>.md"
+
+  create-track-handoff:
+    description: "Create a track-boundary handoff for BA->DEV or DEV->Delivery."
+    read:
+      - "docs/04-delivery/feature-implementations.yml"
+      - ".harness/schemas/handoff.schema.yml"
+    output:
+      - "docs/04-delivery/track-handoffs/ba-to-dev/<handoff-id>.yml for BA->DEV"
+      - "docs/04-delivery/track-handoffs/dev-to-delivery/<handoff-id>.yml for DEV->Delivery"
+
+  review-pr:
+    description: "Review PR against harness gates."
+    check:
+      - "gates.before_pull_request"
+      - "quality.documentation"
+      - "quality.technical"
+      - "quality.anti_fiction"
+
+  prepare-release:
+    description: "Prepare release document package."
+    check:
+      - "gates.before_release"
+    update:
+      - "docs/06-release-go-live/05-release-notes.md"
+      - "docs/05-testing-uat/07-release-readiness.md"
+      - "docs/06-release-go-live/02-deployment-guide.md"
+
+  prepare-handover:
+    description: "Prepare handover package and final checklist."
+    check:
+      - "gates.before_handover"
+    update:
+      - "docs/07-handover-operation/07-final-handover-checklist.md"
+
+  end-session:
+    description: "Mandatory closure contract for every AI working session. Reconcile project-control records before reporting completion. When closing an agent execution, both progress-log.md and latest-session.md must cite its exact execution ID before close-session may succeed."
+    steps:
+      - "update progress-log.md with date, completed work, material blockers/decisions, and next governed action"
+      - "update latest-session.md with an actionable continuation handoff"
+      - "if task, sprint, branch, feature, or next-action state changed: reconcile current-state.yml, active-work.md, project-status.md, and product-progress.md"
+      - "if a question, decision, or risk changed: reconcile its authoritative register and rendered/open view"
+      - "if document maturity or registration changed: reconcile document-register.md and document-completion-matrix.md"
+      - "if a lifecycle transition was explicitly confirmed: append the evidence and CONFIRM-TRANSITION line to transition-log.md"
+    checks:
+      - "do not report session completion until every applicable update above is complete"
+      - "a lifecycle transition is not required for progress-log.md or latest-session.md updates"
+    update:
+      - "docs/04-delivery/session-handoffs/latest-session.md"
+      - "docs/00-project-control/active-work.md"
+      - "docs/00-project-control/project-status.md"
+      - "docs/00-project-control/logs/progress-log.md"
+      - "docs/00-project-control/registers/document-completion-matrix.md"
+      - "docs/00-project-control/registers/document-register.md"
+      - "docs/00-project-control/registers/product-progress.md"
+      - "docs/00-project-control/current-state.yml"
+      - "docs/00-project-control/questions/open-question-log.md"
+      - "docs/00-project-control/questions/open-questions/open.md"
+      - "docs/00-project-control/decisions/decision-log.md"
+      - "docs/00-project-control/risks/risk-assumption-log.md"
+
+  seed-documents:
+    description: "Initialize document content from available project context."
+    inputs:
+      - "docs/01-discovery/"
+      - "docs/00-project-control/questions/open-question-log.md"
+    outputs:
+      - "documents updated with seeded content"
+      - "document maturity advanced from stub to seeded"
+
+  fulfill-document:
+    description: "Fill a specific document based on its fulfillment config."
+    required_input:
+      - document_id
+    steps:
+      - "read .harness/documents.yml"
+      - "read .harness/document-fulfillment.yml entry for document_id"
+      - "read required input sources"
+      - "fill missing sections"
+      - "mark unresolved content as TBD with linked open question"
+      - "update document maturity"
+      - "update docs/00-project-control/registers/document-completion-matrix.md"
+
+  update-impacted-docs:
+    description: "Update documents impacted by current task."
+    steps:
+      - "read active task file"
+      - "read Impacted Documents section"
+      - "update changed sections in each impacted doc"
+      - "record any new gaps in open-question-log.md"
+      - "advance maturity by at most one step if appropriate"
+      - "do not skip document maturity states: stub -> seeded -> draft -> reviewed -> accepted"
+      - "do not close the active task or activate the next phase unless the current maturity gate is explicitly satisfied"
+      - "if task/phase/status/decision/risk/question state changed, run sync-project-control"
+
+  sync-project-control:
+    description: "Synchronize rendered project-control views with current state."
+    update:
+      - "docs/00-project-control/current-state.yml"
+      - "docs/00-project-control/active-work.md"
+      - "docs/00-project-control/project-status.md"
+      - "docs/00-project-control/logs/progress-log.md"
+      - "docs/00-project-control/registers/document-completion-matrix.md"
+      - "docs/00-project-control/registers/document-register.md"
+      - "docs/00-project-control/registers/product-progress.md"
+      - "docs/00-project-control/questions/open-question-log.md"
+      - "docs/00-project-control/questions/open-questions/open.md"
+      - "docs/00-project-control/decisions/decision-log.md"
+      - "docs/00-project-control/risks/risk-assumption-log.md"
+    checks:
+      - "project-status.md agrees with current-state.yml"
+      - "document-register.md agrees with .harness/documents.yml"
+      - "document-completion-matrix.md agrees with document frontmatter"
+      - "product-progress.md agrees with current-state.yml, active task, features.yml, user-stories.yml, open-question-log.md, risk-assumption-log.md, and document-completion-matrix.md"
+      - "document maturity advanced by no more than one state unless an explicit exception is recorded"
+      - "open-questions/open.md agrees with open-question-log.md"
+      - "decision-log.md includes accepted decisions made during the task"
+      - "risk-assumption-log.md includes active assumptions and risks"
+
+  prepare-phase-package:
+    description: "Prepare documents for phase review."
+    required_input:
+      - phase
+    steps:
+      - "list documents in phase from .harness/documents.yml"
+      - "validate required sections via .harness/document-fulfillment.yml"
+      - "update document-completion-matrix.md"
+      - "generate review package under docs/99-published/<version>/<phase>/"
+
+  prepare-published-package:
+    description: "Generate official document outputs."
+    steps:
+      - "check mandatory documents reach required maturity"
+      - "run scripts/publish-documents.js"
+      - "update docs/99-published/<version>/published-package-index.md"
+
+  reflect-session:
+    description: "Review the completed session and identify improvement opportunities."
+    read:
+      - "docs/04-delivery/session-handoffs/latest-session.md"
+      - "docs/00-project-control/logs/progress-log.md"
+      - "docs/00-project-control/questions/open-question-log.md"
+      - "docs/00-project-control/decisions/decision-log.md"
+    output:
+      - "docs/00-project-control/quality/improvement-log.md"
+      - "docs/00-project-control/quality/recurring-issues.md"
+
+  propose-harness-improvement:
+    description: "Propose changes to harness rules/templates based on repeated issues."
+    requires_human_approval: true
+    output:
+      - "improvement proposal in improvement-log.md"
+      - "affected harness files"
+      - "expected benefit"
+      - "risk"
+
+  compact-project-memory:
+    description: "Compact oversized progress, handoff, transition, and log files into summaries and archives."
+    steps:
+      - "identify oversized files using quality.memory_management thresholds (progress-log, transition-log, session handoffs, active-work)"
+      - "preserve current state"
+      - "create archive snapshots under docs/00-project-control/archive/ or per-sprint folders"
+      - "for transition-log.md: move only closed entries; archived transition logs are immutable (quality.memory_management.transition_log_archive_is_immutable) and the active log retains recent entries plus a pointer to each archived slice"
+      - "create summary index"
+      - "update current-state.yml pointers"
+      - "verify no active context is lost"
+
+  summarize-sprint-memory:
+    description: "Create sprint-level memory summary from task files, handoffs, progress logs, and decisions."
+    output:
+      - "docs/04-delivery/session-handoffs/sprint-xxx/sprint-xxx-handoff-summary.md"
+
+  update-quality-score:
+    description: "Update project quality score based on current documents, gates, progress, and delivery evidence."
+    read:
+      - "docs/00-project-control/registers/document-completion-matrix.md"
+      - "docs/00-project-control/registers/product-progress.md"
+      - "docs/00-project-control/logs/progress-log.md"
+      - "docs/00-project-control/questions/open-question-log.md"
+      - "docs/04-delivery/session-handoffs/latest-session.md"
+      - "docs/05-testing-uat/"
+      - "docs/06-release-go-live/"
+    update:
+      - "docs/00-project-control/quality/quality-score.md"
+
+  create-execution-plan:
+    description: >-
+      Create a paper-implementation execution plan for complex or risky
+      implementation work. The plan must be developer-actionable and
+      QA-verifiable with no open clarifications (IMP-0012), not a design
+      restatement.
+    read:
+      - "docs/00-project-control/current-state.yml"
+      - "active task"
+      - "linked requirement"
+      - "linked design"                       # ground in the SPECIFIC accepted design sections
+      - "linked integration/data/API/security/UI design docs as applicable"
+      - "actual repository artifacts (imported models/.edmx, destinations, existing services, shared packages)"
+      - "the frozen functional-spec baseline + BA->DEV handoff (for feature_implementation work)"
+    template: ".harness/templates/execution-plan-template.md"
+    must_include:
+      - "grounding in named accepted design sections AND actual repo artifacts (not generic mechanisms)"
+      - "a WBS of developer-actionable tasks with concrete entities/fields, service/handler behavior, components, and file targets"
+      - "exact integration wiring per external call (destination name + subaccount/instance type, remote-service vs value-help source, read-only/no-fallback guarantees)"
+      - "every acceptance criterion mapped to a validation-plan row"
+      - "cross-plan entity ownership + build sequencing"
+      - "design gaps resolved decisively (frozen baseline governs) with non-blocking doc-reconciliation tasks; no open clarifications"
+    output:
+      - "docs/04-delivery/exec-plans/active/<plan-id>.md"
+
+  start-implementation-notes:
+    description: >-
+      Create the running implementation-notes log for an implementation
+      record at DEV implementation start and keep it current: out-of-spec
+      decisions, deviations/changes from the plan or baseline, tradeoffs,
+      build-time assumptions, and anything a reviewer/PO/PM should know.
+      Maintained live (not reconstructed); required evidence for DEV
+      `implement -> self-review`.
+    read:
+      - "active task"
+      - "the execution plan / frozen baseline for the impl_id"
+    template: ".harness/templates/implementation-notes-template.html"
+    output:
+      - "docs/04-delivery/implementation-notes/<IMPL-ID>-implementation-notes.html"
+
+  run-agent-state:
+    description: >-
+      Resolve one live feature-implementation BA or DEV state, select the bound
+      named agent, assemble least-context input, then wait at a human dispatch
+      gate before that agent begins work; record an auditable execution without
+      applying a lifecycle transition.
+    required_input:
+      - impl_id
+    optional_input:
+      run_intent:
+        enum: [fresh, clean-replay]
+        default: fresh
+      supersedes_execution:
+        description: "Prior execution record(s) evaluated by a clean replay; never treated as completion evidence."
+    read:
+      - "AGENTS.md"
+      - "docs/00-project-control/current-state.yml"
+      - "docs/00-project-control/active-work.md"
+      - "docs/04-delivery/feature-implementations.yml"
+      - ".harness/agent-bindings.yml"
+      - ".harness/orchestration-contract.yml"
+      - ".harness/orchestration-contract-ba.yml"
+      - ".harness/roles.yml"
+      - ".harness/gates.yml"
+      - ".harness/quality.yml"
+      - ".harness/transitions.yml"
+      - ".agent/agents/harness/runtime/prompt-assembly.md"
+      - ".agent/agents/harness/runtime/side-effect-policy.md"
+      - ".agent/agents/harness/runtime/gate-policy.md"
+      - ".agent/agents/harness/runtime/work-ledger-policy.md"
+      - ".agent/agents/harness/runtime/summary-contract.md"
+      - ".agent/agents/harness/runtime/evaluation-policy.md"
+    preconditions:
+      - "impl_id resolves to a live feature_implementation record"
+      - "exactly one eligible BA/DEV state has a non-null agent binding; the runtime stops for an explicit human track choice if both are eligible"
+      - "the selected state has an orchestration policy entry in its track contract (a declared no-agent boundary or missing policy stops preparation)"
+      - "selected manifest supports the live routed state"
+      - "selected completion contract matches the live routed state"
+      - "human-gated dispatch contract is available"
+      - "baseline, handoff, gate, and permission prerequisites for the state are satisfied"
+      - "existing uncommitted changes are classified and protected"
+      - "every applicable execution-plan WBS item or BA functional-context item is represented as one atomic work item, including an explicit verified-no-change disposition where applicable"
+      - "a clean replay inspects live sources and does not inherit prior output as current completion evidence"
+      - "node .harness/scripts/agent-runtime.mjs conformance exits 0 for the frozen pilot runtime"
+    steps:
+      - "run node .harness/scripts/agent-runtime.mjs prepare --impl <impl_id> --execution-id <execution-id> --intent <fresh|clean-replay>; do not invoke an agent if preparation fails"
+      - "route using the selected track workflow declared in .harness/agent-bindings.yml"
+      - "validate the selected manifest, completion contract, human-gated dispatch contract, and effective project binding"
+      - "use only the runner-created schema-version 1.3 context.json, prompt-manifest.json, progress.json, work-inventory.json, scope-start.json, execution.json, and dispatch.md"
+      - "human opens a fresh AI session and provides dispatch.md; the selected agent must run acknowledge and start before its evidence-driven work loop"
+      - "after each iteration update progress signature, evidence, no-progress count, and completion checks"
+      - "do not return COMPLETED or COMPLETED_WITH_WARNINGS while any required atomic item, acceptance criterion, validation, or completion check remains pending, blocked, or unaccounted"
+      - "use PAUSED only for an explicit user-approved checkpoint or runtime maintenance; include a complete continuation contract"
+      - "stop only on verified completion, true blocker, no-progress limit, hard iteration limit, runtime failure, or allowed PAUSED checkpoint"
+      - "write schema-version 1.3 result.json, evaluation.json, events.jsonl updates, and summary.md; the agent must not set a lifecycle transition"
+      - "run node .harness/scripts/agent-runtime.mjs finalize --execution <execution-id>; a non-zero exit rejects the result and forbids any gate or transition proposal"
+      - "run the normal end-session project-control closure: update progress-log.md and latest-session.md with the exact execution ID, then perform the required closure checks"
+      - "run node .harness/scripts/agent-runtime.mjs close-session --execution <execution-id>; a non-zero exit forbids any gate or transition proposal"
+      - "return recommendation to the existing Harness gate only after the execution is closed; do not apply or confirm a transition"
+    simulation:
+      - "read and report routing only"
+      - "do not create .harness/executions artifacts"
+      - "do not invoke an agent or mutate project files"
+    output:
+      - ".harness/executions/<execution-id>/execution.json"
+      - ".harness/executions/<execution-id>/events.jsonl"
+      - ".harness/executions/<execution-id>/context.json"
+      - ".harness/executions/<execution-id>/prompt-manifest.json"
+      - ".harness/executions/<execution-id>/progress.json"
+      - ".harness/executions/<execution-id>/dispatch.md"
+      - ".harness/executions/<execution-id>/result.json"
+      - ".harness/executions/<execution-id>/evaluation.json"
+      - ".harness/executions/<execution-id>/summary.md"
+
+  close-execution-plan:
+    description: "Close execution plan after completion."
+    steps:
+      - "verify completion criteria"
+      - "update linked task"
+      - "update session handoff"
+      - "move plan from active/ to completed/"
+
+  archive-resolved-items:
+    description: "Move resolved questions, closed defects, and completed tasks into archive files."
+    requires:
+      - "no active item is moved"
+      - "archive index is updated"

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Runtime-owned loop ledger record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "sequence", "record_kind", "timestamp", "agent", "previous_ledger_sha256", "progress_before_sha256", "progress_after_sha256", "record_sha256"],
+  "properties": {
+    "schema_version": { "const": "1.3" },
+    "execution_id": { "type": "string" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "record_kind": { "enum": ["initialized", "attempt-opened", "attempt-resumed", "attempt-abandoned", "committed-iteration"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "agent": { "type": "string" },
+    "attempt_id": { "type": ["string", "null"] },
+    "committed_iteration": { "type": "integer", "minimum": 0 },
+    "candidate_ref": { "type": ["string", "null"] },
+    "candidate_sha256": { "type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$" },
+    "meaningful_progress": { "type": "boolean" },
+    "summary": { "type": "string" },
+    "reason": { "type": "string" },
+    "confirmed_by": { "type": "string" },
+    "previous_ledger_sha256": { "type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$" },
+    "progress_before_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "progress_after_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "record_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+  }
+}
+

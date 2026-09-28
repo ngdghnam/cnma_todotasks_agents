@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent execution evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "agent", "rubric_ref", "context_assembly", "criteria", "overall_result", "evaluator"],
+  "properties": {
+    "schema_version": { "enum": ["1.0", "1.1", "1.2", "1.3"] },
+    "execution_id": { "type": "string" },
+    "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+    "rubric_ref": { "type": "string" },
+    "context_assembly": { "type": "object", "required": ["score", "evidence_refs"], "properties": { "score": { "type": "integer", "minimum": 0, "maximum": 2 }, "evidence_refs": { "type": "array", "items": { "type": "string" } }, "notes": { "type": "string" } } },
+    "criteria": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["id", "score", "evidence_refs"], "properties": { "id": { "type": "string" }, "score": { "type": "integer", "minimum": 0, "maximum": 2 }, "evidence_refs": { "type": "array", "items": { "type": "string" } }, "notes": { "type": "string" } } } },
+    "runtime_adherence": { "type": "object", "additionalProperties": false, "required": ["status", "violations"], "properties": { "status": { "enum": ["pass", "fail", "not-evaluable"] }, "violations": { "type": "array", "items": { "type": "string" } } } },
+    "overall_result": { "enum": ["pass", "pass-with-findings", "fail", "not-evaluable"] },
+    "evaluator": { "type": "string" }
+  },
+  "allOf": [
+    { "if": { "properties": { "schema_version": { "enum": ["1.1", "1.2", "1.3"] } } }, "then": { "required": ["runtime_adherence"] } }
+  ]
+}
+

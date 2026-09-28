@@ -1,0 +1,356 @@
+# Object lifecycle transitions
+#
+# Purpose
+#   Single source of truth for how each tracked object (document, user
+#   story, feature, test case, release, ...) is allowed to move between
+#   maturity / status states, and what evidence the AI must quote before
+#   asking the user to confirm a transition.
+#
+# How the AI must use this file
+#   1. Never flip an object's maturity / status / signed_off field on its
+#      own. The AI may only edit those fields after the user has typed
+#      the CONFIRM-TRANSITION string for the proposed transition.
+#   2. Before proposing a transition, the AI must:
+#        a. Read this file and locate the matching transition entry.
+#        b. Verify the object currently sits in the declared `from` state.
+#        c. Collect every item in `requires_evidence` as a verbatim quote
+#           with `path:line` reference. Paraphrasing is not evidence.
+#        d. Verify the actor role matches `requires_role`. If the active
+#           session owner is not in that list, the AI proposes the
+#           transition but tells the user that the listed role must be
+#           the one to confirm.
+#        e. If the move declares `requires_gate`, verify each named gate
+#           in .harness/gates.yml is satisfied and quote the satisfying
+#           evidence, exactly as for `requires_evidence`. A gate marked
+#           "only if ..." applies only when that condition holds. This
+#           keeps transition-driven progress governed by the same phase
+#           gates as command-driven progress (e.g. review-pr).
+#        f. If the move declares `requires_handoff`, verify a handoff
+#           artifact for the impl_id exists and validates against
+#           .harness/schemas/handoff.schema.yml (handoff_type:
+#           track-boundary). For a BA->DEV boundary it must carry
+#           `baseline_ref` and `version`; quote them as evidence. The
+#           receiving track builds against that frozen baseline version.
+#        g. Authority: an agent may PROPOSE only transitions inside its
+#           role's `may_advance` domain (.harness/roles.yml). Parent
+#           `feature` moves and the BA rework reopen
+#           (ready-for-build->rework) are coordinator-only (Project
+#           Manager). Outside its domain an agent may draft the proposal
+#           but must defer confirmation to the owning role.
+#   3. The AI then emits a proposal block of the form:
+#
+#        PROPOSE-TRANSITION <object-type> <object-id> <from>-><to>
+#        Evidence:
+#          - <quote 1> (<path:line>)
+#          - <quote 2> (<path:line>)
+#        Required confirmer role: <role>
+#        To confirm, reply with:
+#          CONFIRM-TRANSITION <object-type> <object-id> <from>-><to> by:<role> on:<YYYY-MM-DD>
+#
+#   4. Only after the user replies with the exact CONFIRM-TRANSITION line
+#      may the AI edit the object's lifecycle fields and append an entry
+#      to docs/00-project-control/logs/transition-log.md containing the
+#      proposal, evidence quotes, and the confirm line.
+#
+# Notes
+#   - This is a guidance contract, not an enforced runtime check. A human
+#     who edits YAML directly can bypass it; the goal is to keep the AI
+#     and a cooperating user from accidentally skipping steps.
+#   - `from` and `to` values must match the lifecycle vocabulary used by
+#     the object's schema (see .harness/schemas/*.schema.yml and the
+#     status / maturity enums in .harness/documents.yml).
+#   - New object types: add a top-level key under `transitions:` and
+#     mirror the document shape.
+
+transitions:
+  document:
+    # Source of lifecycle state: .harness/documents.yml entry for the
+    # given DOC-ID (fields: status, maturity, signed_off).
+    state_source: ".harness/documents.yml"
+    state_fields:
+      maturity: "maturity"
+      status: "status"
+      signed_off: "signed_off"
+
+    moves:
+      stub_to_seeded:
+        from: { maturity: "stub" }
+        to:   { maturity: "seeded" }
+        requires_evidence:
+          - "section_content_quote: at least one required section now has real content sourced from an upstream artifact"
+          - "source_traceability_quote: upstream source file path that the seeded content draws from"
+        requires_role: ["Owner-of-DOC"]
+
+      seeded_to_draft:
+        from: { maturity: "seeded" }
+        to:   { maturity: "draft" }
+        requires_evidence:
+          - "content_completeness_quote: every required section is filled or marked TBD with a linked open question"
+          - "open_question_links_quote: each TBD references an OQ-id from open-question-log.md"
+        requires_role: ["Owner-of-DOC"]
+
+      draft_to_reviewed:
+        from: { maturity: "draft" }
+        to:   { maturity: "reviewed" }
+        requires_evidence:
+          - "reviewer_comment_quote: reviewer left a substantive review note (not just 'lgtm')"
+          - "open_issues_addressed_quote: each reviewer comment is resolved or tracked"
+        requires_role: ["Reviewer-of-DOC"]
+
+      reviewed_to_accepted:
+        from: { maturity: "reviewed" }
+        to:   { maturity: "accepted" }
+        requires_evidence:
+          - "acceptance_statement_quote: the reviewer/approver explicitly states acceptance"
+          - "signoff_recorded_quote: if signoff_required=true, the signoff line (by + date) is captured"
+        requires_role: ["Reviewer-of-DOC"]
+
+      any_to_obsolete:
+        from: { maturity: "*" }
+        to:   { maturity: "obsolete" }
+        requires_evidence:
+          - "supersession_quote: the replacement artifact or the decision retiring this document"
+        requires_role: ["Owner-of-DOC", "Project Manager"]
+
+  user_story:
+    # Source of lifecycle state: an entry in
+    # docs/02-requirements/user-stories.yml, mirrored in DOC-011 when
+    # rendered for human review (field: status).
+    state_source: "docs/02-requirements/user-stories.yml"
+    state_fields:
+      status: "status"
+
+    moves:
+      proposed_to_ready:
+        from: { status: "proposed" }
+        to:   { status: "ready" }
+        requires_evidence:
+          - "accepted_feature_quote: linked_feature points to an accepted feature"
+          - "source_traceability_quote: source_refs link to accepted requirement or traceability artifacts"
+          - "acceptance_criteria_quote: acceptance_criteria are complete and testable"
+          - "readiness_review_quote: Product Owner or Business Analyst confirms the story is ready for sprint consideration"
+        requires_role: ["Product Owner", "Business Analyst"]
+
+      ready_to_in_progress:
+        from: { status: "ready" }
+        to:   { status: "in-progress" }
+        requires_evidence:
+          - "sprint_commitment_quote: story is committed to an active sprint or explicitly approved for implementation"
+          - "development_owner_quote: delivery owner is assigned"
+        requires_role: ["Product Owner", "Scrum Master", "Project Manager"]
+
+      in_progress_to_done:
+        from: { status: "in-progress" }
+        to:   { status: "done" }
+        requires_evidence:
+          - "acceptance_criteria_passed_quote: linked acceptance criteria are verified"
+          - "test_evidence_quote: test or validation evidence is recorded"
+          - "product_acceptance_quote: Product Owner accepts the completed story or confirms no product acceptance is required"
+        requires_role: ["Product Owner", "QA"]
+
+      any_to_obsolete:
+        from: { status: "*" }
+        to:   { status: "obsolete" }
+        requires_evidence:
+          - "supersession_quote: replacement story, feature, requirement, or decision retiring this story"
+        requires_role: ["Product Owner", "Business Analyst", "Project Manager"]
+
+  feature:
+    # Source of lifecycle state: an entry in
+    # docs/02-requirements/features.yml, mirrored in DOC-016 when
+    # rendered for human review (field: status).
+    state_source: "docs/02-requirements/features.yml"
+    state_fields:
+      status: "status"
+
+    moves:
+      proposed_to_accepted:
+        from: { status: "proposed" }
+        to:   { status: "accepted" }
+        requires_evidence:
+          - "source_traceability_quote: source_refs link to accepted requirement or discovery artifacts"
+          - "requirement_link_quote: linked_requirements point to accepted REQ-* records"
+          - "scope_alignment_quote: feature is inside accepted Phase-1 scope or explicitly marked as later-phase scope"
+          - "acceptance_statement_quote: Product Owner accepts the feature for backlog decomposition"
+        requires_role: ["Product Owner"]
+
+      accepted_to_in_progress:
+        from: { status: "accepted" }
+        to:   { status: "in-progress" }
+        requires_evidence:
+          - "ready_story_quote: linked_user_stories include at least one ready story"
+          - "sprint_commitment_quote: feature or its stories are committed to an active sprint or explicitly approved for implementation"
+          - "implementation_record_quote: a feature_implementation record for this feature is created/opened in docs/04-delivery/feature-implementations.yml (all tracks not-started)"
+        requires_role: ["Product Owner", "Scrum Master", "Project Manager"]
+
+      in_progress_to_delivered:
+        from: { status: "in-progress" }
+        to:   { status: "delivered" }
+        requires_evidence:
+          - "story_completion_quote: linked user stories are done or remaining stories are explicitly descoped"
+          - "delivery_evidence_quote: delivery evidence or release evidence is recorded"
+          - "delivery_track_quote: the feature_implementation record's delivery.status is `delivered` (gate: Delivery track complete)"
+          - "product_acceptance_quote: Product Owner accepts the delivered feature or confirms release acceptance will occur separately"
+        requires_role: ["Product Owner", "Project Manager"]
+
+      any_to_obsolete:
+        from: { status: "*" }
+        to:   { status: "obsolete" }
+        requires_evidence:
+          - "supersession_quote: replacement feature, requirement, or decision retiring this feature"
+        requires_role: ["Product Owner", "Business Analyst", "Project Manager"]
+
+  feature_implementation:
+    # Source of lifecycle state: an entry in
+    # docs/04-delivery/feature-implementations.yml. Three independent
+    # tracks (BA, DEV, Delivery) each advance through their own states.
+    # Schema: .harness/schemas/feature-implementation.schema.yml
+    #
+    # Cross-track gates are enforced as requires_evidence quotes:
+    #   - DEV `not-started -> plan` requires BA `ready-for-build`.
+    #   - Delivery `not-started -> accepted` requires DEV `ready-for-delivery`.
+    #   - Feature `in-progress -> delivered` (see feature object above)
+    #     requires Delivery `delivered`.
+    state_source: "docs/04-delivery/feature-implementations.yml"
+    state_fields:
+      ba_status: "ba.status"
+      dev_status: "dev.status"
+      delivery_status: "delivery.status"
+
+    moves:
+      # ---- BA track: not-started -> intake -> clarify -> draft -> reviewed -> ready-for-build
+      ba_start_intake:
+        from: { ba_status: "not-started" }
+        to:   { ba_status: "intake" }
+        requires_evidence:
+          - "feature_accepted_quote: linked feature is accepted and in-progress"
+        requires_role: ["Business Analyst"]
+
+      ba_intake_to_clarify:
+        from: { ba_status: "intake" }
+        to:   { ba_status: "clarify" }
+        requires_evidence:
+          - "intake_captured_quote: functional intake for the feature is captured"
+        requires_role: ["Business Analyst"]
+
+      ba_clarify_to_draft:
+        from: { ba_status: "clarify" }
+        to:   { ba_status: "draft" }
+        requires_evidence:
+          - "clarifications_resolved_quote: open clarifications are resolved or tracked as open questions"
+        requires_role: ["Business Analyst"]
+
+      ba_draft_to_reviewed:
+        from: { ba_status: "draft" }
+        to:   { ba_status: "reviewed" }
+        requires_evidence:
+          - "reviewer_comment_quote: a reviewer left a substantive note on the functional draft"
+        requires_role: ["Business Analyst", "Product Owner"]
+
+      ba_reviewed_to_ready_for_build:
+        from: { ba_status: "reviewed" }
+        to:   { ba_status: "ready-for-build" }
+        requires_evidence:
+          - "acceptance_criteria_quote: acceptance criteria are complete and testable"
+          - "build_readiness_quote: Product Owner or Business Analyst confirms the feature is ready for build"
+          - "baseline_committed_quote: the functional spec is committed and a BA->DEV track-boundary handoff is issued with baseline_ref (spec_docs + git_ref) and version (version+1 if re-issued after a rework)"
+        requires_role: ["Business Analyst", "Product Owner"]
+
+      # ---- BA rework loop (coordinator-gated): a committed baseline is reopened
+      ba_rework_from_ready:
+        from: { ba_status: "ready-for-build" }
+        to:   { ba_status: "rework" }
+        requires_evidence:
+          - "change_reason_quote: why the committed spec must change"
+          - "dev_impact_quote: current dev.status is recorded; IF dev.status is beyond `not-started`, coordinator approval AND a DEV notification are recorded (DEV is building against a baseline that is now changing)"
+        requires_role: ["Project Manager"]   # coordinator authorizes the reopen
+
+      ba_rework_to_clarify:
+        from: { ba_status: "rework" }
+        to:   { ba_status: "clarify" }
+        requires_evidence:
+          - "rework_scope_quote: the scope of the spec change is captured before re-clarification"
+        requires_role: ["Business Analyst"]  # BA then resumes clarify->draft->reviewed->ready-for-build
+
+      # ---- DEV track: not-started -> plan -> implement -> self-review -> unit-test -> verify -> ready-for-delivery
+      dev_start_plan:
+        from: { dev_status: "not-started" }
+        to:   { dev_status: "plan" }
+        requires_gate:
+          - before_development
+          - before_complex_work   # only if the work is complex/risky
+        requires_handoff:
+          boundary: "BA->DEV"
+          evidence: "a track-boundary handoff (handoff.schema.yml, handoff_type: track-boundary) exists for this impl_id, carrying baseline_ref (committed spec + git_ref) and version; record it as dev.baseline_version"
+        requires_evidence:
+          - "ba_ready_quote: this record's ba.status is `ready-for-build` (cross-track gate)"
+          - "development_gate_quote: gates.before_development is satisfied (feature accepted, story links, acceptance criteria, design maturity)"
+          - "baseline_version_quote: dev.baseline_version is set to the BA->DEV handoff version DEV builds against"
+        requires_role: ["Developer"]
+
+      dev_plan_to_implement:
+        from: { dev_status: "plan" }
+        to:   { dev_status: "implement" }
+        requires_evidence:
+          - "plan_quote: an implementation plan or execution plan exists for the feature"
+        requires_role: ["Developer"]
+
+      dev_implement_to_self_review:
+        from: { dev_status: "implement" }
+        to:   { dev_status: "self-review" }
+        requires_evidence:
+          - "implementation_quote: code/change for the feature is present"
+        requires_role: ["Developer"]
+
+      dev_self_review_to_unit_test:
+        from: { dev_status: "self-review" }
+        to:   { dev_status: "unit-test" }
+        requires_evidence:
+          - "self_review_quote: developer self-review is recorded (error handling and authorization checked per quality.technical)"
+        requires_role: ["Developer"]
+
+      dev_unit_test_to_verify:
+        from: { dev_status: "unit-test" }
+        to:   { dev_status: "verify" }
+        requires_evidence:
+          - "unit_test_quote: unit test results are recorded"
+        requires_role: ["Developer"]
+
+      dev_verify_to_ready_for_delivery:
+        from: { dev_status: "verify" }
+        to:   { dev_status: "ready-for-delivery" }
+        requires_gate:
+          - before_pull_request
+        requires_evidence:
+          - "verification_evidence_quote: verification evidence is recorded (quality.technical.require_test_evidence) — DEV verify MUST have evidence"
+          - "release_note_quote: release note is updated if the change is user-facing (quality.technical.require_release_note_for_user_facing_change)"
+          - "pr_gate_quote: gates.before_pull_request is satisfied (impacted docs, design/API/data-model/security/release-notes updated as applicable)"
+        requires_role: ["Developer"]
+
+      # ---- Delivery track: not-started -> accepted -> delivered
+      delivery_start_accepted:
+        from: { delivery_status: "not-started" }
+        to:   { delivery_status: "accepted" }
+        requires_handoff:
+          boundary: "DEV->Delivery"
+          evidence: "a track-boundary handoff (handoff_type: track-boundary) exists for this impl_id"
+        requires_evidence:
+          - "dev_ready_quote: this record's dev.status is `ready-for-delivery` (cross-track gate)"
+        requires_role: ["Project Manager"]
+
+      delivery_accepted_to_delivered:
+        from: { delivery_status: "accepted" }
+        to:   { delivery_status: "delivered" }
+        requires_gate:
+          - before_release   # only when the feature is delivered via a release
+        requires_evidence:
+          - "delivery_evidence_quote: delivery/release evidence for the feature is recorded"
+        requires_role: ["Project Manager"]
+
+  test_case:
+    state_source: "frontmatter of the test case markdown file"
+    moves: {}
+
+  release:
+    state_source: "frontmatter of the release notes markdown file"
+    moves: {}

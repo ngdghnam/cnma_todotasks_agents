@@ -1,0 +1,32 @@
+# init.ps1 — Windows bootstrap for {{PROJECT_TITLE}}
+#
+# Usage: powershell -ExecutionPolicy Bypass -File ./init.ps1
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+Write-Host "=== {{PROJECT_TITLE}} Bootstrap ===" -ForegroundColor Cyan
+
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Error "Node.js is not installed or not on PATH. Install from https://nodejs.org."
+    exit 1
+}
+Write-Host "Node: $(node --version)"
+
+if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+    Write-Error "npm is not installed or not on PATH."
+    exit 1
+}
+Write-Host "npm: $(npm --version)"
+
+Write-Host "`nInstalling root dependencies..." -ForegroundColor Yellow
+npm install
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# Uncomment if frontend exists:
+# Write-Host "`nInstalling frontend dependencies..." -ForegroundColor Yellow
+# npm install --prefix app/<ui-folder>
+# if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+Write-Host "`n=== Bootstrap complete ===" -ForegroundColor Green
+Write-Host "Run '{{CMD_DEV_BACKEND}}' to start the backend."

@@ -1,0 +1,111 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Feature Implementation"
+type: object
+description: |
+  A feature *implementation* record. This object is separate from the
+  feature *definition* (see feature.schema.yml). Feature definition tracks
+  product lifecycle (proposed -> accepted -> in-progress -> delivered);
+  this record tracks the operational, role-separated implementation of an
+  accepted feature across three tracks (BA, DEV, Delivery).
+
+  Lifecycle rule: create one implementation record when a feature moves
+  `accepted -> in-progress`. Keep it 1:1 with the feature. If a delivered
+  feature is re-opened, create a NEW record that sets `supersedes` to the
+  prior record rather than re-opening closed track states.
+
+  Track transitions are governed by `.harness/transitions.yml`
+  (object type `feature_implementation`) and follow the same
+  PROPOSE/CONFIRM evidence protocol as every other tracked object.
+required: [id, feature, ba, dev, delivery]
+properties:
+  id:
+    type: string
+    pattern: "^IMPL-[0-9]{3,}$"
+    description: "Stable implementation id, e.g. IMPL-001. Independent of the feature number."
+  feature:
+    type: string
+    pattern: "^FEAT-[0-9]{3,}$"
+    description: "The accepted feature this record implements (1:1)."
+  linked_user_stories:
+    type: array
+    items: { type: string, pattern: "^US-[0-9]{3,}$" }
+  linked_tasks:
+    type: array
+    items: { type: string, pattern: "^TASK-[0-9]{4,}$" }
+  sprint:
+    type: string
+    pattern: "^SPRINT-[0-9]{3,}$"
+    description: "Sprint the implementation is committed to, if any."
+
+  ba:
+    type: object
+    description: "Business Analyst track. Owner role: Business Analyst."
+    required: [status]
+    properties:
+      status:
+        type: string
+        enum: ["not-started", "intake", "clarify", "draft", "reviewed", "ready-for-build", "rework"]
+        description: "`rework` = a committed baseline was reopened (coordinator-gated); BA resumes via rework -> clarify."
+      owner: { type: string }
+      artifacts:
+        type: array
+        items: { type: string }
+        description: "Functional/clarification docs produced by the BA track."
+      notes: { type: string }
+
+  dev:
+    type: object
+    description: "Developer track. Owner role: Developer. Gated on ba.status = ready-for-build."
+    required: [status]
+    properties:
+      status:
+        type: string
+        enum: ["not-started", "plan", "implement", "self-review", "unit-test", "verify", "ready-for-delivery"]
+      owner: { type: string }
+      evidence:
+        type: array
+        items: { type: string }
+        description: |
+          Verification evidence (test output, delivery-evidence refs).
+          Required to reach `verify` and `ready-for-delivery`
+          (quality.technical.require_test_evidence).
+      baseline_version:
+        type: integer
+        minimum: 1
+        description: |
+          The BA->DEV handoff version this DEV work builds against. On a new
+          baseline (after a rework), DEV must re-sync to the new version.
+      notes: { type: string }
+
+  delivery:
+    type: object
+    description: "Delivery track. Owner role: Project Manager (coordinator). Gated on dev.status = ready-for-delivery."
+    required: [status]
+    properties:
+      status:
+        type: string
+        enum: ["not-started", "accepted", "delivered"]
+      owner: { type: string }
+      evidence:
+        type: array
+        items: { type: string }
+        description: "Delivery/release evidence."
+      notes: { type: string }
+
+  derived_status:
+    type: string
+    description: |
+      OPTIONAL, NON-AUTHORITATIVE reporting cache derived from the three
+      track states. Never gate on this field; recompute from ba/dev/delivery.
+    enum: ["not-started", "ba-in-progress", "ready-for-build", "dev-in-progress", "ready-for-delivery", "delivered"]
+
+  supersedes:
+    type: string
+    pattern: "^IMPL-[0-9]{3,}$"
+    description: "Prior implementation record this one replaces (feature re-open)."
+  superseded_by:
+    type: string
+    pattern: "^IMPL-[0-9]{3,}$"
+
+  created: { type: string, format: date }
+  updated: { type: string, format: date }

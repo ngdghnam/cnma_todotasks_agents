@@ -1,0 +1,69 @@
+# ARCHITECTURE.md
+
+Top-level structural map of this repository. Records **only what is verifiable
+in the current working tree**. Behavior, class names, and patterns are
+deliberately absent — they are decided per slice during the *clarify* stage of
+`docs/04-project/harness/engineering/implementation-workflow.md`.
+
+## System Shape
+
+- Product: `{{PROJECT_NAME}}`
+- Runtime stack: {{STACK}}
+- Implementation status: greenfield. The harness is set up; no application code has been written under this harness yet.
+
+## What Exists In The Tree
+
+The following directories and files are present in the working tree as of this
+session. They are the structural inputs every slice starts from. Anything not
+listed here does **not** exist yet and must not be referenced as if it does.
+
+| Surface | Path |
+|---|---|
+| — | *fill in at first slice's clarify stage* |
+
+> Fill the rows above with the real top-level surfaces of this repo
+> (schema, services, app, build/runtime config) at the **first slice's
+> clarify stage** as a Harness Delta. Do not pre-declare surfaces that
+> do not yet exist.
+
+## Layer Model
+
+The implementation must follow a directional layer order. Define the
+layer roles for this stack at the first slice's *clarify* stage. Until
+then, this section is *intentionally empty* — a guess here biases every
+downstream slice.
+
+```
+<layer 1>
+    ↓
+<layer 2>
+    ↓
+<layer 3>
+    ...
+```
+
+## Hard Dependency Rules
+
+Hard rules grow only from closed-slice evidence. Until the first slice
+closes, this section is intentionally empty.
+
+- A new dependency, namespace, or layer requires updating this file in the same change.
+- Implementation choices (class names, enum values, status codes, processor topology) are decided per slice and recorded in the active plan and the matching product spec. They are not pre-declared here.
+
+## Hot Spots (verified state)
+
+| Command | Status | Last Run |
+|---|---|---|
+| — | — | — |
+
+> Fill at the first slice's *verify* stage with the actual commands and
+> their current status.
+
+## Change Checklist
+
+When a slice touches architecture-relevant code:
+
+1. Update this file if the layer model, hard dependency rules, or the "what exists in the tree" list changed.
+2. Update or create the matching product spec under `docs/04-project/slices/01-product-specs/` for any user-visible behavior introduced.
+3. Update or create the active plan under `docs/04-project/slices/02-exec-plans/features/active/`.
+4. Update `CONSTRAINTS.md` only if a new project-wide structural rule was confirmed by the slice (not by inference).

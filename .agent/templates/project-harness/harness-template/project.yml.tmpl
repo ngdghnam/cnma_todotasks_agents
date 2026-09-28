@@ -1,0 +1,55 @@
+project:
+  code: "{{PROJECT_CODE}}"
+  name: "{{PROJECT_TITLE}}"
+  slug: "{{PROJECT_NAME}}"
+  type: "{{PROJECT_TYPE}}"
+  delivery_model: "{{DELIVERY_MODEL}}"
+  stack: "{{STACK_DESC}}"
+  harness_profile: "{{HARNESS_PROFILE}}"
+
+repository:
+  documentation_source: "docs"
+
+state:
+  source: "docs/00-project-control/current-state.yml"
+
+project_control:
+  current_state: "docs/00-project-control/current-state.yml"
+  active_work: "docs/00-project-control/active-work.md"
+  project_status: "docs/00-project-control/project-status.md"
+
+registers:
+  document_register: "docs/00-project-control/registers/document-register.md"
+  document_completion_matrix: "docs/00-project-control/registers/document-completion-matrix.md"
+
+logs:
+  progress_log: "docs/00-project-control/logs/progress-log.md"
+  progress_archive: "docs/00-project-control/logs/progress/"
+
+questions:
+  open_question_log: "docs/00-project-control/questions/open-question-log.md"
+  open_questions: "docs/00-project-control/questions/open-questions/open.md"
+  resolved_questions: "docs/00-project-control/questions/resolved/"
+
+decisions:
+  decision_log: "docs/00-project-control/decisions/decision-log.md"
+
+risks:
+  risk_assumption_log: "docs/00-project-control/risks/risk-assumption-log.md"
+
+quality:
+  quality_score: "docs/00-project-control/quality/quality-score.md"
+  improvement_log: "docs/00-project-control/quality/improvement-log.md"
+  recurring_issues: "docs/00-project-control/quality/recurring-issues.md"
+  working_patterns: "docs/00-project-control/quality/working-patterns.md"
+  retrospective_log: "docs/00-project-control/quality/retrospective-log.md"
+
+project_data:
+  requirements: "docs/02-requirements/requirements.yml"
+  features: "docs/02-requirements/features.yml"
+  user_stories: "docs/02-requirements/user-stories.yml"
+  sprint_planning: "docs/04-delivery/sprint-planning.yml"
+
+official_output:
+  published_folder: "docs/99-published"
+  document_repository: "TBD"

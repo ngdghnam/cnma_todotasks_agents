@@ -1,0 +1,147 @@
+schema_version: "1.3"
+schema: .agent/agents/harness/schemas/agent-bindings.schema.json
+description: >
+  Project-owned binding from live feature-implementation BA and DEV states to
+  reusable project-local agents. This file contains routing only; target and
+  execution context are resolved from live project sources at runtime.
+
+catalog:
+  cap-business-analysis:
+    display_name: Clarity
+    governed_role: Business Analyst
+    manifest: .agent/agents/harness/agents/clarity/manifest.yml
+  cap-solution:
+    display_name: Atlas
+    governed_role: Developer
+    manifest: .agent/agents/harness/agents/atlas/manifest.yml
+  cap-implementation:
+    display_name: Forge
+    governed_role: Developer
+    manifest: .agent/agents/harness/agents/forge/manifest.yml
+  cap-quality:
+    display_name: Verity
+    governed_role: QA
+    manifest: .agent/agents/harness/agents/verity/manifest.yml
+
+bindings:
+  feature_implementation.ba.status:
+    not-started: null
+    intake:
+      agent: cap-business-analysis
+      mode: intake
+    clarify:
+      agent: cap-business-analysis
+      mode: clarify
+    draft:
+      agent: cap-business-analysis
+      mode: draft
+    reviewed:
+      agent: cap-business-analysis
+      mode: reviewed
+    ready-for-build: null
+    rework:
+      agent: cap-business-analysis
+      mode: rework
+
+  feature_implementation.dev.status:
+    not-started: null
+    plan:
+      agent: cap-solution
+      mode: plan
+    implement:
+      agent: cap-implementation
+      mode: implement
+    self-review:
+      agent: cap-implementation
+      mode: self-review
+    unit-test:
+      agent: cap-implementation
+      mode: unit-test
+    verify:
+      agent: cap-quality
+      mode: verify
+    ready-for-delivery: null
+
+runtime:
+  enforcement_mode: human-gated-manual-audited
+  command: run-agent-state
+  workflow: .agent/agents/harness/workflows/implement-feature.workflow.md
+  tracks:
+    ba:
+      workflow: .agent/agents/harness/workflows/prepare-functional-spec.workflow.md
+      orchestration_contract: .harness/orchestration-contract-ba.yml
+    dev:
+      workflow: .agent/agents/harness/workflows/implement-feature.workflow.md
+      orchestration_contract: .harness/orchestration-contract.yml
+  executions_root: .harness/executions
+  state_source: docs/04-delivery/feature-implementations.yml
+  prompt_assembly: .agent/agents/harness/runtime/prompt-assembly.md
+  side_effect_policy: .agent/agents/harness/runtime/side-effect-policy.md
+  gate_policy: .agent/agents/harness/runtime/gate-policy.md
+  work_ledger_policy: .agent/agents/harness/runtime/work-ledger-policy.md
+  loop_ledger_policy: .agent/agents/harness/runtime/loop-ledger-v3.md
+  summary_contract: .agent/agents/harness/runtime/summary-contract.md
+  evaluation_policy: .agent/agents/harness/runtime/evaluation-policy.md
+  pilot_runtime: .agent/agents/harness/runtime/pilot-runtime.md
+  human_dispatch: .agent/agents/harness/runtime/human-gated-dispatch.md
+  runner: .harness/scripts/agent-runtime.mjs
+  manifest_schema: .agent/agents/harness/schemas/agent-manifest.schema.json
+  execution_schema: .agent/agents/harness/schemas/execution-manifest.schema.json
+  event_schema: .agent/agents/harness/schemas/execution-event.schema.json
+  context_schema: .agent/agents/harness/schemas/execution-context.schema.json
+  prompt_schema: .agent/agents/harness/schemas/prompt-manifest.schema.json
+  progress_schema: .agent/agents/harness/schemas/progress-ledger.schema.json
+  result_schema: .agent/agents/harness/schemas/agent-result.schema.json
+  evaluation_schema: .agent/agents/harness/schemas/evaluation.schema.json
+  completion_schema: .agent/agents/harness/schemas/completion-contract.schema.json
+  orchestration_contract: .harness/orchestration-contract.yml
+  orchestration_schema: .agent/agents/harness/schemas/orchestration-contract.schema.json
+  loop_state_schema: .agent/agents/harness/schemas/loop-state.schema.json
+  loop_ledger_record_schema: .agent/agents/harness/schemas/loop-ledger-record.schema.json
+  iteration_candidate_schema: .agent/agents/harness/schemas/iteration-candidate.schema.json
+  rules:
+    - read_live_state_before_routing
+    - project_binding_may_only_narrow_manifest_permissions
+    - no_concurrent_mutating_execution_for_same_target
+    - no_agent_applies_or_confirms_lifecycle_transition
+    - simulations_create_no_execution_artifacts
+    - agent_completed_requires_runtime_verified_completion_contract
+    - budgets_are_observe_only_during_pilot
+    - new_execution_uses_schema_version_1_3
+    - atomic_work_inventory_required
+    - no_partial_scope_as_completed_with_warnings
+    - paused_requires_allowed_stop_and_continuation
+    - clean_replay_excludes_prior_outputs_from_work_completion
+    - runner_prepare_and_finalize_required_for_real_execution
+    - human_dispatch_confirmation_required_before_agent_work
+    - finalized_execution_requires_project_control_closure_before_gate_return
+    - agent_identity_is_resolved_from_project_binding_not_executor_host
+    - executor_host_and_model_are_not_workflow_inputs
+    - agent_writes_iteration_candidates_not_canonical_progress
+    - runtime_owned_loop_ledger_required
+    - finalized_v3_execution_requires_at_least_one_committed_iteration
+
+permissions:
+  execution_memory_write: .harness/executions/<execution-id>/iteration-candidates/** + .harness/executions/<execution-id>/evidence/** + result/evaluation only
+  project_write_from_context_only: true
+  generated_write:
+    - app/**/dist/**
+    - coverage/**
+    - .nyc_output/**
+    - node_modules/.cache/**
+    - .cds-gen/**
+  protected:
+    - .agent/**
+    - .agent/agents/harness/**
+    - .git/**
+    - docs/04-delivery/functional-specs/baselines/**
+    - docs/04-delivery/track-handoffs/**
+    - "**/*secret*"
+    - "**/*credential*"
+
+evaluations:
+  cap-business-analysis: .agent/agents/harness/evals/clarity.eval.yml
+  cap-solution: .agent/agents/harness/evals/atlas.eval.yml
+  cap-implementation: .agent/agents/harness/evals/forge.eval.yml
+  cap-quality: .agent/agents/harness/evals/verity.eval.yml
+

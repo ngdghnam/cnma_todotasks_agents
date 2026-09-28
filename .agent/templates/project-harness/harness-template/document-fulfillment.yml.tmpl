@@ -1,0 +1,347 @@
+fulfillment:
+  DOC-001:
+    name: Project Brief
+    source: docs/01-discovery/01-project-brief.md
+    fill_triggers:
+      - project_kickoff
+      - discovery_started
+    input_sources:
+      - docs/01-discovery/02-business-context.md
+      - docs/01-discovery/04-stakeholder-map.md
+      - docs/00-project-control/questions/open-question-log.md
+    required_sections:
+      - Purpose
+      - Business Goal
+      - Scope
+      - Stakeholders
+      - Key Risks
+      - Open Questions
+    owner: Project Manager
+    reviewer: Sponsor
+    minimum_maturity_before_development: seeded
+    minimum_maturity_before_release: accepted
+
+  DOC-002:
+    name: Business Context
+    source: docs/01-discovery/02-business-context.md
+    fill_triggers:
+      - discovery_started
+      - stakeholder_interview_completed
+    input_sources:
+      - docs/01-discovery/01-project-brief.md
+      - docs/01-discovery/04-stakeholder-map.md
+    required_sections:
+      - Purpose
+      - Current State
+      - Pain Points
+      - Desired Outcome
+      - Constraints
+      - Open Questions
+    owner: Business Analyst
+    reviewer: Project Manager
+    minimum_maturity_before_development: draft
+    minimum_maturity_before_release: accepted
+
+  DOC-010:
+    name: Product Requirement
+    source: docs/02-requirements/01-product-requirement.md
+    fill_triggers:
+      - discovery_completed
+      - requirement_workshop_completed
+      - user_story_created
+    input_sources:
+      - docs/01-discovery/01-project-brief.md
+      - docs/01-discovery/02-business-context.md
+      - docs/02-requirements/06-user-stories.md
+      - docs/00-project-control/questions/open-question-log.md
+    required_sections:
+      - Purpose
+      - Scope
+      - User Personas
+      - Functional Requirements
+      - Acceptance Criteria
+      - Open Questions
+    owner: Business Analyst
+    reviewer: Product Owner
+    minimum_maturity_before_development: draft
+    minimum_maturity_before_release: accepted
+
+  DOC-011:
+    name: User Stories
+    source: docs/02-requirements/06-user-stories.md
+    fill_triggers:
+      - requirement_workshop_completed
+      - backlog_refinement
+    input_sources:
+      - docs/02-requirements/01-product-requirement.md
+      - docs/02-requirements/07-acceptance-criteria.md
+    required_sections:
+      - Purpose
+      - Story List
+      - Acceptance Criteria Link
+      - Priority
+      - Dependencies
+      - Open Questions
+    owner: Business Analyst
+    reviewer: Product Owner
+    minimum_maturity_before_development: draft
+
+  DOC-012:
+    name: Acceptance Criteria
+    source: docs/02-requirements/07-acceptance-criteria.md
+    fill_triggers:
+      - user_story_created
+    input_sources:
+      - docs/02-requirements/06-user-stories.md
+    required_sections:
+      - Purpose
+      - Criteria by Story
+      - Edge Cases
+      - Non-Functional Aspects
+      - Open Questions
+    owner: Business Analyst
+    reviewer: QA
+    minimum_maturity_before_development: draft
+
+  DOC-020:
+    name: Solution Architecture
+    source: docs/03-solution-design/01-solution-architecture.md
+    fill_triggers:
+      - requirement_phase_completed
+      - architecture_decision_made
+    input_sources:
+      - docs/02-requirements/01-product-requirement.md
+      - docs/02-requirements/08-non-functional-requirements.md
+      - docs/03-solution-design/adr/
+    required_sections:
+      - Purpose
+      - Architecture Overview
+      - Components
+      - Integration Landscape
+      - Non-Functional Aspects
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Solution Architect
+    minimum_maturity_before_development: draft
+    minimum_maturity_before_release: accepted
+
+  DOC-021:
+    name: Technical Design
+    source: docs/03-solution-design/03-technical-design.md
+    fill_triggers:
+      - feature_design_started
+      - api_changed
+      - data_model_changed
+      - authorization_changed
+    input_sources:
+      - docs/02-requirements/01-product-requirement.md
+      - docs/03-solution-design/01-solution-architecture.md
+      - srv/
+      - db/
+    required_sections:
+      - Component Overview
+      - Service Design
+      - Data Model
+      - API Design
+      - Authorization
+      - Error Handling
+      - Logging
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Solution Architect
+    minimum_maturity_before_pr: draft
+    minimum_maturity_before_release: accepted
+
+  DOC-022:
+    name: Data Model
+    source: docs/03-solution-design/04-data-model.md
+    fill_triggers:
+      - data_model_changed
+    input_sources:
+      - db/
+      - docs/03-solution-design/03-technical-design.md
+    required_sections:
+      - Purpose
+      - Entities
+      - Relationships
+      - Constraints
+      - Migration Notes
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Solution Architect
+    minimum_maturity_before_pr: draft
+
+  DOC-023:
+    name: Integration Design
+    source: docs/03-solution-design/05-integration-design.md
+    fill_triggers:
+      - integration_identified
+      - destination_added
+    input_sources:
+      - docs/03-solution-design/01-solution-architecture.md
+    required_sections:
+      - Purpose
+      - Integration List
+      - Destination Config
+      - Authentication
+      - Error Handling
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Solution Architect
+    minimum_maturity_before_pr: draft
+    minimum_maturity_before_release: accepted
+
+  DOC-024:
+    name: Security & Authorization
+    source: docs/03-solution-design/07-security-authorization.md
+    fill_triggers:
+      - authorization_changed
+      - role_collection_changed
+    input_sources:
+      - docs/02-requirements/01-product-requirement.md
+      - docs/03-solution-design/03-technical-design.md
+    required_sections:
+      - Purpose
+      - Role Model
+      - Scope & Role Collections
+      - Authorization Checks
+      - Sensitive Data Handling
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Security Officer
+    minimum_maturity_before_pr: draft
+    minimum_maturity_before_release: accepted
+
+  DOC-030:
+    name: Test Strategy
+    source: docs/05-testing-uat/01-test-strategy.md
+    fill_triggers:
+      - test_phase_started
+    input_sources:
+      - docs/02-requirements/08-non-functional-requirements.md
+    required_sections:
+      - Purpose
+      - Test Scope
+      - Test Types
+      - Tools
+      - Environments
+      - Open Questions
+    owner: QA
+    reviewer: Project Manager
+    minimum_maturity_before_release: accepted
+
+  DOC-031:
+    name: UAT Script
+    source: docs/05-testing-uat/05-uat-script.md
+    fill_triggers:
+      - uat_phase_started
+    input_sources:
+      - docs/02-requirements/07-acceptance-criteria.md
+      - docs/02-requirements/06-user-stories.md
+    required_sections:
+      - Purpose
+      - UAT Scenarios
+      - Test Data
+      - Expected Results
+      - Sign-off
+      - Open Questions
+    owner: Business Analyst
+    reviewer: Product Owner
+    minimum_maturity_before_release: accepted
+
+  DOC-040:
+    name: Release Notes
+    source: docs/06-release-go-live/05-release-notes.md
+    fill_triggers:
+      - release_scope_changed
+      - user_facing_change_merged
+    input_sources:
+      - docs/04-delivery/02-change-log.md
+      - docs/04-delivery/tasks/
+    required_sections:
+      - Highlights
+      - New Features
+      - Bug Fixes
+      - Breaking Changes
+      - Known Issues
+      - Deployment Notes
+    owner: Project Manager
+    reviewer: Product Owner
+    minimum_maturity_before_release: accepted
+
+  DOC-041:
+    name: Deployment Guide
+    source: docs/06-release-go-live/02-deployment-guide.md
+    fill_triggers:
+      - deployment_behavior_changed
+      - new_environment_added
+    input_sources:
+      - mta.yaml
+      - docs/03-solution-design/05-integration-design.md
+    required_sections:
+      - Purpose
+      - Prerequisites
+      - Deployment Steps
+      - Post-Deployment Verification
+      - Rollback
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Project Manager
+    minimum_maturity_before_release: accepted
+
+  DOC-050:
+    name: User Guide
+    source: docs/07-handover-operation/01-user-guide.md
+    fill_triggers:
+      - user_facing_feature_completed
+    input_sources:
+      - docs/02-requirements/06-user-stories.md
+      - app/
+    required_sections:
+      - Purpose
+      - Audience
+      - Feature Walkthroughs
+      - FAQ
+      - Support Contacts
+    owner: Business Analyst
+    reviewer: Product Owner
+    minimum_maturity_before_handover: accepted
+
+  DOC-051:
+    name: Admin Guide
+    source: docs/07-handover-operation/02-admin-guide.md
+    fill_triggers:
+      - admin_feature_completed
+      - role_collection_changed
+    input_sources:
+      - docs/03-solution-design/07-security-authorization.md
+    required_sections:
+      - Purpose
+      - Administration Tasks
+      - Role Management
+      - Configuration
+      - Monitoring
+      - Open Questions
+    owner: Tech Lead
+    reviewer: Project Manager
+    minimum_maturity_before_handover: accepted
+
+  DOC-052:
+    name: Runbook
+    source: docs/07-handover-operation/03-runbook.md
+    fill_triggers:
+      - incident_pattern_identified
+      - operational_procedure_defined
+    input_sources:
+      - docs/06-release-go-live/02-deployment-guide.md
+      - docs/07-handover-operation/04-troubleshooting-guide.md
+    required_sections:
+      - Purpose
+      - Routine Operations
+      - Monitoring & Alerts
+      - Incident Response
+      - Recovery Procedures
+      - Escalation
+    owner: Tech Lead
+    reviewer: Support Lead
+    minimum_maturity_before_handover: accepted

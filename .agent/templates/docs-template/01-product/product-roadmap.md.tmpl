@@ -1,0 +1,57 @@
+# Product Roadmap — {{PROJECT_TITLE}}
+
+> **Owner:** Product / BA Lead | **Last Updated:** {{BOOTSTRAP_DATE}} | **Audience:** Stakeholders + AI agent
+
+The **canonical list of features** that make up this product, with status
+and (optional) priority waves. This file is the product-level answer to
+*"what features does this product need?"* — separate from the
+project-level question *"what are we committing to this sprint?"*
+
+This file is **product-layer**, so it is **allowed** to reference feature
+IDs in `planned` status that have not yet entered `04-project/backlog.md`.
+That is the explicit purpose of a product roadmap.
+(See `04-project/harness/engineering/core-beliefs.md` —
+*Forward-Reference Is Fiction* — for the project-vs-product scope split.)
+
+## Vision
+
+*Fill at Sprint 0 product-foundation-01-product slice. Two or three
+sentences naming the long-term outcome the product is trying to achieve.*
+
+## Feature Catalog
+
+Status lifecycle:
+`planned` → `in-backlog` → `in-flight` → `shipped` → `deprecated`
+
+| ID | Name | Business Goal | Wave | Status | Source |
+|---|---|---|---|---|---|
+| — | *empty — fill at Sprint 0* | — | — | — | — |
+
+## Rules
+
+- One row per feature the product needs. Slice IDs follow `feature-NNN-<slug>` per `04-project/harness/engineering/implementation-workflow.md`.
+- *Business Goal* is one sentence in user-facing language. No technical detail.
+- *Wave* is optional. Use it when the product has natural sequencing buckets (Foundation / Core / Growth / Optimization). Leave blank for small products.
+- Every row carries a *Source*: `catalog v1` for the bootstrap-time catalog, or `user request YYYY-MM-DD` / `stakeholder workshop YYYY-MM-DD` for later additions. Untraceable rows are forbidden.
+
+## Status Transitions
+
+| From | To | Trigger |
+|---|---|---|
+| `planned` | `in-backlog` | Planner promotes the row to `04-project/backlog.md`. Status updates here in the same commit. |
+| `in-backlog` | `in-flight` | Sprint commits the row to `sprints/<sprint>/commitments.md`. Status updates here in the same commit. |
+| `in-flight` | `shipped` | Feature slice closes. Status updates here in the close-stage Product Delta. |
+| any | `deprecated` | Product owner retires the feature. Row stays in this file for history; new product-roadmap entries do not reference it. |
+
+## How AI Agent Uses This
+
+- At cold-start, the agent surfaces the count of features in each status (planned / in-backlog / in-flight / shipped). This is **product-level visibility**, distinct from the project-level backlog count.
+- When the user asks *"what's next?"* after closing a slice, the agent reads this file and proposes the lowest-wave feature with status `planned` as the next candidate for Planner promotion to backlog.
+- AI Agent **does not edit this file unless instructed**. The product roadmap is owned by Product / BA Lead. AI Agent reads it, surfaces summary, and asks for explicit approval before adding/removing/reprioritizing rows.
+
+## Update Triggers
+
+- **Sprint 0** — first population (vision + initial catalog).
+- **Product Owner adds a feature** — manual edit, with `Source` naming the trigger.
+- **Slice transitions** — automatic status flip on backlog promotion, sprint commit, and slice close.
+- **Quarterly review** — owner re-prioritizes waves and statuses based on user feedback and business signals.

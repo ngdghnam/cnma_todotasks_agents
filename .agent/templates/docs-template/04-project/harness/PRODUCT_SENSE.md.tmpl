@@ -1,0 +1,53 @@
+# PRODUCT_SENSE.md
+
+This file captures durable product judgment that agents cannot infer reliably
+from code alone.
+
+## Product Core
+
+- Primary users: {{PRIMARY_USERS}}
+- Job to be done: {{JTBD}}
+- Main frustration to remove: *fill in at first concept slice close*.
+- Quality bar for acceptance: {{QUALITY_BAR}}
+
+## Product Rules
+
+- Favor user-visible reliability over feature count.
+- Treat ambiguous behavior as a spec gap, not permission to guess.
+- Preserve user-facing behavior unless the spec explicitly changes it.
+- If implementation changes what users see or trust, update the matching product spec.
+- Use product specs for concrete flows, and use this file for cross-cutting product priorities.
+
+## Priority Ordering
+
+When the Planner hat must choose between two viable candidates from
+`backlog.md` and no business deadline forces a choice, sequence by this
+descending order:
+
+1. **Foundation concepts** (authorization, role models, status matrices,
+   data-visibility rules) — every downstream feature inherits them;
+   deferring them causes rework, not just delay.
+2. **Read surfaces** (worklist, detail, search) — users adopt the system
+   through what they can see before what they can change. A trustworthy
+   read story unblocks adoption.
+3. **Write surfaces with local effect** (create, update within the
+   system boundary) — fewer external dependencies, faster verify cycle.
+4. **Write surfaces with external effect** (integration with external
+   systems, scheduled sync, public APIs) — depend on stable read and
+   local-write foundations; failure modes are harder to verify, so they
+   ship after the slices they call.
+5. **UI migration onto stable backend APIs** — only after the backend
+   APIs being migrated to are closed and verified, never in parallel
+   with the API slice that defines them.
+
+This ordering is the default. A user instruction in the current sprint
+overrides it; the override must be recorded as one line in the sprint's
+`commitments.md` with the reason. Silent reordering is a harness defect.
+
+## No-Go Patterns
+
+- Hidden destructive actions.
+- Silent failure without user feedback.
+- Unclear source of truth for visible state.
+- Features that cannot be explained in one sentence.
+- UI changes that bypass existing role, i18n, or routing conventions.

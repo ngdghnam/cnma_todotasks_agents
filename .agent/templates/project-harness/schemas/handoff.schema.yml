@@ -1,0 +1,40 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Session Handoff"
+type: object
+required: [session_date, task_id, branch, current_goal, what_was_done, next_steps]
+properties:
+  session_date:
+    type: string
+    format: date
+  task_id:
+    type: string
+  branch:
+    type: string
+  current_goal:
+    type: string
+  what_was_done:
+    type: array
+    items: { type: string }
+  files_changed:
+    type: array
+    items: { type: string }
+  current_understanding:
+    type: string
+  decisions_made:
+    type: array
+  open_questions:
+    type: array
+  blockers:
+    type: array
+  build_status:
+    type: string
+    enum: ["green", "red", "unknown"]
+  test_status:
+    type: string
+    enum: ["passing", "failing", "unknown"]
+  next_steps:
+    type: array
+    items: { type: string }
+  context_to_read_next:
+    type: array
+    items: { type: string }

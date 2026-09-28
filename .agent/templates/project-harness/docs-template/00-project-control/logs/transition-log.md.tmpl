@@ -1,0 +1,41 @@
+# Transition Log — {{PROJECT_TITLE}}
+
+> Append-only. One entry per confirmed object-lifecycle transition.
+> Newest entries at the top.
+>
+> Every entry is produced by the `PROPOSE-TRANSITION` /
+> `CONFIRM-TRANSITION` protocol defined in `.harness/transitions.yml`
+> and `AGENTS.md` §3.1. The AI must never flip an object's `maturity`,
+> `status`, or `signed_off` field without recording the transition
+> here, including the verbatim evidence quotes it presented and the
+> exact confirm string the user replied with.
+>
+> Rotation: when this log exceeds
+> `.harness/quality.yml.memory_management.max_transition_log_lines`, it is
+> rotated per `rotate_transition_log_by` (sprint). Closed entries move to an
+> immutable slice under
+> `docs/00-project-control/archive/transition-log-<sprint-or-date>/`; this
+> active log keeps recent entries plus the "Archived slices" pointers below.
+
+## Archived slices
+
+_None yet._
+
+## Entry template
+
+```
+### <YYYY-MM-DD> — <object-type> <object-id> <from> -> <to>
+
+- Proposed by: <AI session id or "AI">
+- Confirmed by: <role / user>
+- Confirm string: CONFIRM-TRANSITION <type> <id> <from>-><to> by:<role> on:<YYYY-MM-DD>
+- Evidence:
+  - "<quote 1>" (<path:line>)
+  - "<quote 2>" (<path:line>)
+- Notes: <optional>
+```
+
+## Entries
+
+_No transitions recorded yet. The first entry is appended when the AI runs the
+`PROPOSE-TRANSITION` / `CONFIRM-TRANSITION` protocol against a tracked object._

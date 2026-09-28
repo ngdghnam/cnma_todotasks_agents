@@ -1,0 +1,159 @@
+{
+    "name": "cap-project-template",
+    "version": "1.0.0",
+    "description": "SAP CAP Project with TypeScript type sharing",
+    "dependencies": {
+        "@cap-js/hana": "^2",
+        "@cnma/cap-core": "^1.0.0",
+        "@sap-cloud-sdk/connectivity": "^4.6.0",
+        "@sap-cloud-sdk/http-client": "^4.6.0",
+        "@sap/cds": "^9",
+        "@sap/xssec": "^4",
+        "axios": "^1.16.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4"
+    },
+    "devDependencies": {
+        "@cap-js/cds-typer": "^0.38.0",
+        "@cap-js/cds-types": "^0.15.0",
+        "@cap-js/sqlite": "^2",
+        "@sap/cds-dk": "^9",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.6",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^25.0.3",
+        "@types/qs": "^6.15.1",
+        "concurrently": "^9",
+        "eslint": "^9",
+        "eslint-config-prettier": "^10",
+        "husky": "^9",
+        "jest": "^30",
+        "lint-staged": "^16",
+        "prettier": "^3",
+        "rimraf": "^5.0.7",
+        "ts-jest": "^29",
+        "ts-node": "^10",
+        "tsx": "^4",
+        "typescript": "^5"
+    },
+    "scripts": {
+        "start": "cds-serve",
+        "build:types": "cds-typer \"*\" --outputDirectory @cds-models",
+        "watch:types": "cds-typer \"*\" --outputDirectory @cds-models --watch",
+        "types": "npm run build:types",
+        "dev": "concurrently \"npm run watch:types\" \"cds watch\"",
+        "test": "jest",
+        "prepare": "husky",
+        "idev": "npm i --include=dev",
+        "clean": "rimraf gen mta_archives ui_resources .mta_build_tmp @cds-models",
+        "build": "cds build --production",
+        "build:ts": "echo 'Compiling TypeScript...' && tsc",
+        "build:db": "cds build --production",
+        "build:srv": "mbt module-build -m=srv -t mta_archives",
+        "build:cf": "npm run clean && npm run build:ts && npm run build && mbt build --mtar project.mtar",
+        "deploy": "cf deploy mta_archives/project.mtar --retries 1",
+        "deploy:cf": "npm run build:cf && npm run deploy",
+        "deploy:payg": "npm run clean && mbt build && cf deploy mta_archives/project.mtar --retries 1 -e .deploycfg/payg.mtaext",
+        "deploy:cpea": "npm run clean && mbt build && cf deploy mta_archives/project.mtar --retries 1 -e .deploycfg/cpea.mtaext",
+        "deploy:db": "npm run build:db && cds deploy --to hana",
+        "deploy:srv": "npm run build:srv && cf deploy mta_archives/project.mtar -m=srv",
+        "deploy:app": "npm run clean && mbt module-build -m=ui_deployer -a -g && cf deploy -m ui_deployer",
+        "cf:payg": "cf login -a https://api.cf.eu10.hana.ondemand.com",
+        "cf:cpea": "cf login -a https://api.cf.eu10-004.hana.ondemand.com",
+        "psize": "ls -lh mta_archives/project.mtar"
+    },
+    "private": true,
+    "eslintConfig": {
+        "extends": "eslint:recommended",
+        "env": {
+            "es2020": true,
+            "node": true
+        },
+        "globals": {
+            "SELECT": true,
+            "INSERT": true,
+            "UPDATE": true,
+            "DELETE": true,
+            "CREATE": true,
+            "DROP": true,
+            "CDL": true,
+            "CQL": true,
+            "CXL": true,
+            "cds": true
+        },
+        "rules": {
+            "no-console": "off"
+        }
+    },
+    "cds": {
+        "requires": {
+            "db": {
+                "kind": "sqlite",
+                "credentials": {
+                    "url": "db.sqlite"
+                },
+                "[production]": {
+                    "kind": "hana"
+                }
+            },
+            "auth": {
+                "kind": "mocked",
+                "users": {
+                    "alice": {
+                        "password": "alice",
+                        "roles": [
+                            "admin",
+                            "authenticated-user"
+                        ]
+                    }
+                },
+                "[production]": {
+                    "kind": "xsuaa"
+                }
+            }
+        },
+        "build": {
+            "[node!]": {
+                "target": "gen",
+                "tasks": [
+                    {
+                        "for": "nodejs"
+                    },
+                    {
+                        "for": "typescript"
+                    },
+                    {
+                        "for": "hana"
+                    }
+                ]
+            },
+            "[hana]": {
+                "target": "gen",
+                "tasks": [
+                    {
+                        "for": "hana"
+                    }
+                ]
+            }
+        },
+        "hana": {
+            "syntax": "hdi",
+            "deploy-format": "hdbtable",
+            "journal": {
+                "enable-drop": false,
+                "change-mode": "alter"
+            }
+        },
+        "odata": {
+            "version": "v4"
+        },
+        "model": [
+            "db",
+            "srv"
+        ]
+    },
+    "imports": {
+        "#cds-models/*": "./@cds-models/*/index.js"
+    }
+}

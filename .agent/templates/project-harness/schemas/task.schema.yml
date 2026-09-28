@@ -1,0 +1,35 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Task"
+type: object
+required: [id, title, status, owner, objective]
+properties:
+  id:
+    type: string
+    pattern: "^TASK-[0-9]{4,}$"
+  title:
+    type: string
+  status:
+    type: string
+    enum: ["Not Started", "In Progress", "In Review", "Blocked", "Completed", "Obsolete"]
+  owner:
+    type: string
+  linked_requirement:
+    type: string
+  linked_design:
+    type: string
+  linked_test_cases:
+    type: array
+    items:
+      type: string
+  objective:
+    type: string
+  acceptance_criteria:
+    type: array
+    items:
+      type: string
+  open_questions:
+    type: array
+  decisions:
+    type: array
+  next_steps:
+    type: array

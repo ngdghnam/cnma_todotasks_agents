@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Feature-implementation track orchestration contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "description", "lifecycle_source", "transition_policy", "routing_policy", "workflow", "advancement", "states", "semantic_routes"],
+  "properties": {
+    "schema": { "const": ".agent/agents/harness/schemas/orchestration-contract.schema.json" },
+    "schema_version": { "enum": ["1.0"] },
+    "description": { "type": "string" },
+    "lifecycle_source": { "type": "string" },
+    "transition_policy": { "const": ".harness/transitions.yml" },
+    "routing_policy": { "const": ".harness/agent-bindings.yml" },
+    "workflow": { "type": "string" },
+    "advancement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["human_confirmation_required", "runtime_may_apply_transition", "agent_may_apply_transition"],
+      "properties": {
+        "human_confirmation_required": { "const": true },
+        "runtime_may_apply_transition": { "const": false },
+        "agent_may_apply_transition": { "const": false }
+      }
+    },
+    "states": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/state" }
+    },
+    "semantic_routes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enforced", "resolver", "routes"],
+      "properties": {
+        "enforced": { "const": false },
+        "resolver": { "type": "string" },
+        "routes": { "type": "object" }
+      }
+    }
+  },
+  "$defs": {
+    "boundaryState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent", "kind"],
+      "properties": {
+        "agent": { "type": "null" },
+        "kind": { "const": "boundary" },
+        "note": { "type": "string" }
+      }
+    },
+    "state": {
+      "oneOf": [{ "$ref": "#/$defs/boundaryState" }, { "$ref": "#/$defs/activeState" }]
+    },
+    "activeState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "agent", "agent_may_propose", "outcomes"],
+      "properties": {
+        "mode": { "enum": ["intake", "clarify", "draft", "reviewed", "rework", "plan", "implement", "self-review", "unit-test", "verify"] },
+        "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+        "agent_may_propose": { "type": "boolean" },
+        "outcomes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["COMPLETED", "COMPLETED_WITH_WARNINGS", "BLOCKED", "FAILED", "PAUSED"],
+          "properties": {
+            "COMPLETED": { "$ref": "#/$defs/outcome" },
+            "COMPLETED_WITH_WARNINGS": { "$ref": "#/$defs/outcome" },
+            "BLOCKED": { "$ref": "#/$defs/outcome" },
+            "FAILED": { "$ref": "#/$defs/outcome" },
+            "PAUSED": { "$ref": "#/$defs/outcome" }
+          }
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action"],
+      "properties": {
+        "action": { "enum": ["propose_transition", "retain_state"] },
+        "target_transition": { "type": "string" },
+        "requires": { "type": "array", "items": { "enum": ["execution_closed", "completion_contract_satisfied", "warning_disposition_present"] } },
+        "require": { "type": "array", "items": { "enum": ["continuation", "blocker_record"] } },
+        "rerun": { "enum": ["human"] }
+      },
+      "allOf": [
+        { "if": { "properties": { "action": { "const": "propose_transition" } } }, "then": { "type": "object", "required": ["target_transition", "requires"] } },
+        { "if": { "properties": { "action": { "const": "retain_state" } } }, "then": { "type": "object", "required": ["require"] } }
+      ]
+    }
+  }
+}
+

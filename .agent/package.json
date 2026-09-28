@@ -1,0 +1,23 @@
+{
+  "name": "cap-agent-team",
+  "version": "0.0.1",
+  "description": "Conarum CAP Development Guideline for Agents",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://conarumdc@dev.azure.com/conarumdc/cdk/_git/cap-agent-team"
+  },
+  "keywords": [
+    "cap",
+    "agent",
+    "cdk"
+  ],
+  "author": "ConarumDevTeam",
+  "license": "ISC"
+}

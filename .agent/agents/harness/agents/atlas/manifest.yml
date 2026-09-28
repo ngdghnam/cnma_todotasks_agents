@@ -1,0 +1,59 @@
+schema_version: "1.0"
+agent:
+  id: cap-solution
+  display_name: Atlas
+  version: 0.1.0
+  status: experimental
+  owner: AI Engineering
+  functional_role: CAP/BTP Technical Planning Specialist
+  governed_role: Developer
+  description: CAP/BTP solution alignment and implementation-plan readiness.
+instructions: .agent/agents/harness/agents/atlas/agent.md
+shared_context:
+  - .agent/agents/harness/shared/cap-btp-mindset.md
+  - .agent/agents/harness/shared/execution-context-contract.md
+capabilities:
+  - context-resolution
+  - cap-impact-analysis
+  - implementation-plan-alignment
+  - data-api-security-impact-analysis
+supported_states: [plan]
+skills:
+  - .agent/agents/harness/skills/resolve-implementation-context.md
+  - .agent/agents/harness/skills/cap-solution-alignment.md
+contracts:
+  input: .agent/agents/harness/schemas/execution-context.schema.json
+  output: .agent/agents/harness/schemas/agent-result.schema.json
+  completion:
+    plan: .agent/agents/harness/contracts/states/plan-completion.yml
+tools:
+  allow: [filesystem.read, repository.search, git.diff]
+  deny: [filesystem.write.project, lifecycle.apply, transition.confirm]
+memory:
+  project: read-only-through-context
+  execution: read-write
+  private_persistent: denied
+runtime:
+  enforcement_mode: manual-audited
+  max_attempts: 1
+  sandbox_profile: read-only-project
+  concurrent_for_same_target: false
+  require_scope_check: true
+  budgets:
+    enforcement: observe
+    max_tool_calls: 30
+    max_iterations: 12
+loop:
+  strategy: evidence-driven
+  progress_schema: .agent/agents/harness/schemas/progress-ledger.schema.json
+  max_no_progress_iterations: 2
+  hard_iteration_limit: 30
+  continue_when: [incomplete_work_exists, progress_was_made, no_blocker_exists]
+  stop_when: [completion_predicate_satisfied, blocker_detected, no_progress_limit_reached, hard_iteration_limit_reached]
+observability:
+  emit: [agent.started, context.loaded, iteration.started, progress.updated, completion.evaluated, agent.completed, agent.blocked]
+governance:
+  may_modify_project: false
+  may_propose_transition: false
+  may_apply_transition: false
+

@@ -1,0 +1,21 @@
+schema_version: "1.0"
+contract_id: self-review-completion
+state: self-review
+objective: Complete an evidence-based developer review before governed unit testing.
+success_policy: all-required-checks-pass
+required_checks:
+  - id: REVIEW-DIFF
+    description: The complete live diff is reviewed against the baseline, plan, scope, and project conventions.
+    evidence_required: true
+  - id: REVIEW-FINDINGS
+    description: All self-review findings are recorded and all blocking in-scope findings are resolved.
+    evidence_required: true
+  - id: REVIEW-QUALITY
+    description: CAP boundaries, transactions, authorization, validation, error handling, UI contracts, and compatibility are reviewed where applicable.
+    evidence_required: true
+  - id: REVIEW-EVIDENCE
+    description: Required self-review checklist and evidence artifacts are complete and factual.
+    evidence_required: true
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: Remaining warnings require an owner and must be acceptable to the next Harness gate.
+

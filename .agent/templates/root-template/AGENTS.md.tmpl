@@ -1,0 +1,142 @@
+# AGENTS.md
+
+This repository is optimized for long-running coding-agent work. Keep this file
+short. Use it as the routing layer into the system-of-record docs, not as a
+giant instruction dump.
+
+## Startup Workflow
+
+Before changing code:
+
+1. Confirm the repo root with `pwd`.
+1a. **Confirm which slice the developer is continuing or starting.** The developer must name the slice (e.g. "continue feature-001", "start issue-002", "draft concept-assignment"). If the developer did not state it, **ask** — do not infer from the most recently touched plan. Once named, this slice is the anchor for every read and write in the session. Read `docs/04-project/ACTIVE_WORK.md` to see what other slices are in flight and by whom, so you do not write into someone else's plan.
+2. Run the **cold-start gate** in `CLEAN_STATE_CHECKLIST.md`. Stop at the first red and repair or downgrade the claim before adding scope.
+3. Read `ARCHITECTURE.md` for the system map and hard dependency rules.
+4. Read the workflow doc for the hat you're wearing this session (see *Role Routing* below): `docs/04-project/harness/engineering/ba-workflow.md` for BA-owned feature specs and business concepts (five-stage, intake → clarify → draft → review → publish, on a separate `ba/<slice-id>` branch); `docs/04-project/harness/engineering/implementation-workflow.md` for Developer feature slices (seven-stage, clarify → plan → implement → self-review → test → verify → close — DEV starts only after BA publishes a spec on `main`); `docs/04-project/harness/engineering/sprint-workflow.md` for the Planner hat (four-stage, plan → commit → run → close); `docs/04-project/harness/concepts/index.md` for the Architect hat (technical concept-slice workflow); `docs/04-project/harness/engineering/issue-workflow.md` for regressions against closed features (three-stage issue workflow).
+4a. Read `docs/04-project/slices/02-exec-plans/issues/root-causes.md` for recent defect patterns. Categories that are non-empty against a feature you are about to touch are scan targets in *clarify* and *self-review*.
+5. Read `docs/04-project/harness/QUALITY_SCORE.md` for weak domains, layer health, and known build gaps.
+6. Read `docs/04-project/harness/PLANS.md`, then open the active plan you are working from.
+7. Read the relevant product spec in `docs/04-project/slices/01-product-specs/` (a spec exists only if a feature has already been clarified under this harness).
+8. Read `CONSTRAINTS.md` for the forbidden patterns and the sourcing rule.
+9. Read `docs/04-project/harness/engineering/coding-principles.md` before writing code: service-layer architecture, SOLID, ACID. Smell checklists are review gates.
+10. Read `docs/04-project/harness/RELIABILITY.md` for the standard bootstrap, verification, and restart paths.
+
+## Routing Map
+
+### Product-Level Surfaces (long-lived, audience-facing)
+
+- `docs/PRODUCT_BASELINE.md`: predefine status of 01/02/03/05. Read at every Clarify.
+- `docs/01-product/`: end-user documentation (user manual, admin guide, FAQ). **BA hat owns.**
+- `docs/02-business/`: business processes, data dictionary, requirements. **BA hat owns.**
+- `docs/03-technical/`: architecture narrative, API reference, implementation guide. **Tech Lead hat owns.**
+- `docs/05-releases/`: changelog and release notes per sprint close. **Planner hat owns.**
+
+### Project-Level Surfaces (per development cycle, internal)
+
+- `ARCHITECTURE.md`: what exists in the tree, layer model, hard dependency rules
+- `CONSTRAINTS.md`: forbidden patterns + sourcing rule (only ARCHITECTURE.md or closed slices may add rules)
+- `docs/04-project/harness/engineering/coding-principles.md`: service-layer architecture, SOLID, and ACID — the three non-negotiables for every code slice
+- `docs/04-project/harness/DESIGN.md`: design entrypoint and durable decision-doc routing
+- `docs/04-project/harness/engineering/index.md`: accepted, proposed, and deprecated design decisions
+- `docs/04-project/harness/engineering/ba-workflow.md`: five-stage BA lifecycle (intake → clarify → draft → review → publish) on a separate `ba/<slice-id>` branch — **BA hat owns this end-to-end**; handles `ba-feature` (product spec) and `business-concept` slice types
+- `docs/04-project/harness/engineering/implementation-workflow.md`: seven-stage DEV feature-slice lifecycle (clarify → plan → implement → self-review → test → verify → close) and user approval gates — **Developer hat owns this end-to-end; starts only after a BA spec is published on `main`**
+- `docs/04-project/slices/02-exec-plans/spec-gaps/`: DEV → BA hand-back artifact when a published spec is ambiguous (see the directory's `README.md`)
+- `docs/04-project/harness/engineering/sprint-workflow.md`: four-stage sprint lifecycle (plan → commit → run → close) — used by the **Planner hat**
+- `docs/04-project/harness/concepts/index.md`: concept-level design (cross-feature rules) and the concept-slice workflow — used by the **Architect hat**
+- `docs/04-project/harness/engineering/issue-workflow.md`: three-stage issue (bug-fix) workflow — separate from feature slices, used by the **Developer hat**
+- `docs/04-project/slices/02-exec-plans/issues/index.md`: active and closed issues (TOC)
+- `docs/04-project/slices/02-exec-plans/issues/root-causes.md`: closed issues aggregated by root-cause category — read at cold-start and at clarify/self-review
+- `docs/04-project/harness/PRODUCT_SENSE.md`: durable product priorities for agent judgment
+- `docs/04-project/slices/01-product-specs/index.md`: current user-visible behaviors and acceptance targets
+- `docs/04-project/harness/PLANS.md`: plan lifecycle and execution-plan policy
+- `docs/04-project/harness/QUALITY_SCORE.md`: product-domain and layer health
+- `docs/04-project/harness/RELIABILITY.md`: commands, runtime signals, and restart expectations
+- `docs/04-project/harness/SECURITY.md`: secrets, sandbox, data, and external-action rules
+- `docs/04-project/harness/FRONTEND.md`: frontend constraints, i18n, accessibility, and UI verification (delete if no UI)
+- `feature_list.json`: machine-readable feature tracker and evidence records (rows carry an optional `assignee`)
+- `docs/04-project/ACTIVE_WORK.md`: parallel-work coordination board — one row per active slice with assignee; read at session start
+- `PROGRESS.md`: current verified state + last 3 session records (older sessions live in `docs/04-project/slices/99-progress-archive/`)
+- `CLEAN_STATE_CHECKLIST.md`: cold-start and end-of-session gate
+- `session-handoff.json`: machine-readable handoff state for the next session
+- `scripts/harness-precommit.*` + pre-commit hook (optional): structural pre-commit gate. Runs a fast subset of `CLEAN_STATE_CHECKLIST.md` against the staged diff. Wire up only if the project uses a hook runner (e.g. Husky for Node, pre-commit framework for Python). Bypass with `--no-verify` only when the user has explicitly requested it.
+
+## Role Routing
+
+For solo-1-AI work, the project runs sequentially — only one hat is on at a time. Each hat reads its own workflow doc:
+
+| Role / hat | Activity | Workflow doc |
+|---|---|---|
+| Planner | Open / close a sprint, manage commitments and carry-over | `docs/04-project/harness/engineering/sprint-workflow.md` |
+| Architect | Author a technical concept slice (cross-feature technical rule) | `docs/04-project/harness/concepts/index.md` |
+| BA | Produce a published product spec or business concept; hand off to DEV | `docs/04-project/harness/engineering/ba-workflow.md` (own end-to-end, on branch `ba/<slice-id>`) |
+| Developer | Implement a feature against a published spec; fix a bug | `docs/04-project/harness/engineering/implementation-workflow.md` (DEV-only, starts from published spec); `docs/04-project/harness/engineering/issue-workflow.md` for bugs |
+
+The sequence inside a sprint: **Planner → (Architect if needed) → BA → Developer → Planner (close)**.
+
+Any downstream hat that finds an upstream gap **pauses-and-resumes**: it pauses its own stage, re-triggers the upstream hat, and resumes at the same stage when the upstream work closes. Silent context-switches are a harness defect. (See the *Pause And Resume* section in each workflow doc.)
+
+Role workflow docs for QA, code review, and dedicated architect are intentionally absent — those activities are absorbed by the *Self-Review*, *Verify*, and *Clarify* stages of the implementation workflow for solo work. They get their own doc the day they become a distinct activity.
+
+**BA / DEV separation.** BA workflow and implementation workflow are **fully separate**: different workflow docs, different git branches, different ownership. BA work happens on `ba/<slice-id>` and only reaches `main` at BA *Publish*. DEV branches from `main` after publish and never edits the spec. If DEV finds a spec gap, the hand-back is a **spec-gap file** under `docs/04-project/slices/02-exec-plans/spec-gaps/` that BA picks up via a new ba-workflow run — DEV does not edit the spec directly.
+
+Add a row here when a new role workflow doc is published.
+
+## Working Contract
+
+- Work from one bounded plan or feature slice at a time — the one the developer named at session start.
+- Multiple developers may have slices in flight in parallel. The `feature_list.json` invariant is **one `in_progress` row per assignee**, not one globally. Never edit another assignee's plan, spec, or handoff entry without explicit user instruction.
+- Do not mark work done from code inspection alone; runnable evidence is required.
+- If you change behavior, update the matching product, plan, or reliability docs in the same session.
+- If you see repeated review feedback, promote it into a mechanical rule, check, or linter instead of re-explaining it in chat.
+- Keep generated material in `docs/04-project/harness/generated/`.
+- Prefer adding small, current docs over growing this file.
+- Harness docs are sourced from the current working tree and from confirmed user requirements only. Never import names, patterns, status codes, modules, or rules from prior systems, residue imports in `srv/*.ts`, or agent memory.
+- Do not cross a user-gated stage transition (intake→specify, specify→clarify, clarify→plan, plan→implement, verify→close) without an explicit user approval recorded in the active plan's progress log. Inferred approval is a harness defect.
+- Do not request or cross plan-to-implement approval until the active plan is
+  implementation-ready: concrete files, module responsibilities, APIs/types,
+  input/output shapes, algorithms or decision tables, source mappings, tests,
+  exclusions, and unresolved blockers must be clear enough for the user to
+  evaluate how the work will be built.
+- Harness documents (`ARCHITECTURE.md`, `CONSTRAINTS.md`, coding principles, concepts, product specs) grow only through approved **Harness Deltas** at a slice's *close* stage. Mid-slice edits to durable harness files are forbidden unless they revert a prior unsourced entry.
+- Cross-feature domain rules belong in `docs/04-project/harness/concepts/`, not in `docs/04-project/harness/engineering/`, plans, or feature specs. A feature slice that needs a missing or ambiguous concept pauses at *clarify* and a concept slice runs first.
+- Regressions against a closed feature use the **issue workflow** in `docs/04-project/harness/engineering/issue-workflow.md`, not the feature-slice lifecycle. An issue records a root-cause category from the controlled vocabulary; closing an issue updates the issue file, `docs/04-project/slices/02-exec-plans/issues/index.md`, `docs/04-project/slices/02-exec-plans/issues/root-causes.md`, and `feature_list.json#fix_history[]` in lock-step.
+
+## Refusal Rules
+
+The harness is advisory by design — markdown + JSON cannot physically stop an edit. These rules tell the agent **when to refuse a prompt and ask the developer to re-route** instead of complying. A refusal is *not* an error; it is the agent enforcing the lifecycle on behalf of the developer.
+
+Refuse and re-route in these cases:
+
+1. **No slice named.** The developer's prompt asks for a code change, a fix, or a new feature without naming the slice (per Startup Workflow step 1a). Ask: *"Which slice is this against — feature ID, issue ID, or concept slug? If it is new, do we open a feature slice (intake) or an issue (triage)?"* Do not infer from the most recently touched plan.
+2. **No active plan for a code path.** The prompt asks to modify any file under `srv/**`, `app/**`, `db/**`, or other code paths and `feature_list.json` has no `in_progress` row for the named slice and `docs/04-project/slices/02-exec-plans/issues/active/` has no matching issue plan. Refuse and route through *intake* (feature) or *triage* (issue).
+3. **Skip a user gate.** The prompt explicitly or implicitly asks to skip intake, clarify, plan, or verify→close (e.g. *"just write the code, we'll plan after"*, *"flip it to passing"*, *"close it without runtime evidence"*). Refuse. Cite the gate from `docs/04-project/harness/engineering/implementation-workflow.md` and offer the smallest path that crosses the gate properly.
+4. **Out-of-scope edit.** The prompt asks to change a file that is not in the active plan's *slice scope*. Refuse and offer two routes: revert, or re-declare the slice scope in the plan with a fresh plan→implement approval line (per `CLEAN_STATE_CHECKLIST.md` row 16).
+5. **Bypass the pre-commit hook.** The prompt asks to commit with `--no-verify`, disable the hook, or edit `.husky/` or `scripts/harness-precommit.mjs` outside an approved harness slice. Refuse unless the user has explicitly stated a reason this turn (per `CLAUDE.md` / `docs/04-project/harness/SECURITY.md`).
+6. **Edit another assignee's slice.** The prompt asks to edit a plan, spec, or handoff entry whose row in `feature_list.json` or `docs/04-project/ACTIVE_WORK.md` belongs to a different assignee. Refuse and ask the developer to confirm the takeover explicitly.
+7. **Mid-slice harness edit.** The prompt asks to change `ARCHITECTURE.md`, `CONSTRAINTS.md`, `docs/04-project/harness/engineering/*`, `docs/04-project/harness/concepts/*`, or `docs/04-project/slices/01-product-specs/*` outside of an approved *close* Harness Delta, a published concept slice, or a confirmed user requirement in this session. Refuse and route through the right slice type.
+
+A refusal lists which rule fired and the smallest legitimate next step. A user explicit override (e.g. *"I know, do it anyway, here is the reason"*) is recorded in the active plan's progress log with a one-line justification — never silently obeyed.
+
+## Definition Of Done
+
+A change is done only when all of the following are true:
+
+- target behavior is implemented
+- required verification actually ran, or a blocker is recorded with the exact failing command
+- evidence is linked from the relevant plan, `feature_list.json`, or quality document
+- affected docs remain current
+- no unrelated user worktree changes were reverted
+- the repository can restart cleanly from the standard startup path, or the restart blocker is documented
+
+## End Of Session
+
+Before ending a session:
+
+1. Update the active execution plan.
+2. Update `docs/04-project/harness/QUALITY_SCORE.md` if any domain or layer meaningfully changed.
+3. Record new debt in `docs/04-project/slices/02-exec-plans/tech-debt-tracker.md` if you deferred it.
+4. Move finished plans to `docs/04-project/slices/02-exec-plans/features/completed/` when appropriate.
+5. Rewrite `PROGRESS.md` "Current Verified State" in place and append at most one new entry to "Recent Sessions" using the 5-bullet template. If "Recent Sessions" now holds more than three entries, rotate the oldest into `docs/04-project/slices/99-progress-archive/YYYY-QN.md`.
+6. Update `session-handoff.json` so `currently_verified`, `active_blockers`, and `next_best_action` reflect reality.
+7. **If a slice closed this session, trim the live trackers** (per `CLEAN_STATE_CHECKLIST.md` row 18): reduce that slice's `feature_list.json#evidence[]` to the single close-gate entry (plus the one runtime-shape entry if required); collapse its per-command keys in `session-handoff.json#currently_verified` into one `"<slice_id>_status"` pointer; remove its `next_best_action[]` entry; resolve or migrate its `active_blockers[]`. The full history stays in `docs/04-project/slices/02-exec-plans/features/completed/<slice>.md`.
+8. Run the **end-of-session gate** in `CLEAN_STATE_CHECKLIST.md`. Every box must be green, or the exception must be recorded in `PROGRESS.md` and `session-handoff.json#active_blockers` before closing.

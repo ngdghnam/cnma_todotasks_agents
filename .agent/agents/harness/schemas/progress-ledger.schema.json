@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent execution progress ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "execution_id", "agent", "mode", "iteration", "no_progress_iterations", "work_items", "acceptance_criteria", "completion_checks", "validations", "progress_signature", "termination"],
+  "properties": {
+    "schema_version": { "enum": ["1.0", "1.1", "1.2", "1.3"] },
+    "execution_id": { "type": "string" },
+    "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+    "mode": { "enum": ["intake", "clarify", "draft", "reviewed", "rework", "plan", "implement", "self-review", "unit-test", "verify"] },
+    "iteration": { "type": "integer", "minimum": 0 },
+    "no_progress_iterations": { "type": "integer", "minimum": 0 },
+    "work_plan_source": { "type": "string" },
+    "work_item_inventory_complete": { "type": "boolean" },
+    "unaccounted_source_item_ids": { "type": "array", "items": { "type": "string" } },
+    "work_items": { "type": "array", "items": { "$ref": "#/$defs/trackedItem" } },
+    "acceptance_criteria": { "type": "array", "items": { "$ref": "#/$defs/trackedItem" } },
+    "test_obligations": { "type": "array", "items": { "$ref": "#/$defs/testObligation" } },
+    "completion_checks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/check" } },
+    "completion_evaluation": { "type": "object", "properties": { "all_required_checks_pass": { "type": "boolean" }, "pending_check_ids": { "type": "array", "items": { "type": "string" } }, "pending_work_item_ids": { "type": "array", "items": { "type": "string" } }, "pending_acceptance_criteria_ids": { "type": "array", "items": { "type": "string" } } } },
+    "validations": { "type": "array", "items": { "$ref": "#/$defs/validation" } },
+    "progress_signature": { "type": "string", "description": "Deterministic digest or canonical summary of tracked status/evidence used for stagnation detection." },
+    "last_progress_at": { "type": ["string", "null"], "format": "date-time" },
+    "termination": { "type": "object", "additionalProperties": false, "required": ["status", "reason"], "properties": { "status": { "enum": ["running", "completed", "completed-with-warnings", "paused", "blocked", "failed"] }, "reason": { "type": ["string", "null"] } } }
+  },
+  "allOf": [
+    { "if": { "properties": { "schema_version": { "enum": ["1.1", "1.2", "1.3"] } } }, "then": { "required": ["work_plan_source", "work_item_inventory_complete", "unaccounted_source_item_ids", "test_obligations", "completion_evaluation"], "properties": { "work_items": { "items": { "required": ["atomic", "disposition"] } } } } }
+  ],
+  "$defs": {
+    "trackedItem": { "type": "object", "additionalProperties": false, "required": ["id", "description", "source_ref", "status", "evidence_refs"], "properties": { "id": { "type": "string" }, "parent_id": { "type": ["string", "null"] }, "atomic": { "type": "boolean" }, "description": { "type": "string" }, "source_ref": { "type": "string" }, "status": { "enum": ["pending", "in-progress", "completed", "excluded", "blocked"] }, "disposition": { "enum": ["implemented", "verified-no-change", "approved-exclusion", "blocked", "pending"] }, "evidence_refs": { "type": "array", "items": { "type": "string" } }, "notes": { "type": "string" } } },
+    "testObligation": { "type": "object", "additionalProperties": false, "required": ["id", "path", "source_ref", "status", "evidence_refs"], "properties": { "id": { "type": "string" }, "path": { "type": "string" }, "source_ref": { "type": "string" }, "status": { "enum": ["pending", "verified", "blocked", "not-applicable"] }, "evidence_refs": { "type": "array", "items": { "type": "string" } } } },
+    "check": { "type": "object", "additionalProperties": false, "required": ["id", "status", "evidence_refs"], "properties": { "id": { "type": "string" }, "status": { "enum": ["pending", "pass", "fail", "blocked"] }, "evidence_refs": { "type": "array", "items": { "type": "string" } }, "notes": { "type": "string" } } },
+    "validation": { "type": "object", "additionalProperties": false, "required": ["id", "status", "evidence_ref"], "properties": { "id": { "type": "string" }, "status": { "enum": ["pending", "passed", "failed", "not-applicable", "blocked"] }, "evidence_ref": { "type": ["string", "null"] } } }
+  }
+}
+

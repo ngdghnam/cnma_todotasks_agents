@@ -1,0 +1,42 @@
+# Product Baseline Status
+
+Dashboard for the **predefined product foundation** under `01-product/`,
+`02-business/`, `03-technical/`, `05-releases/`. Read by every slice at
+Clarify to decide whether to proceed with full baseline or fly-blind.
+
+This file is a **status table**, not a workflow doc. It updates whenever a
+Product Foundation slice closes or a Product Delta lands.
+
+## Status Values
+
+| Value | Meaning |
+|---|---|
+| `not_started` | Folder is empty or only has skeleton README. Slices touching it fly-blind. |
+| `seeded` | Some content exists but only enough for AI to read structure. Slices touching it fly-blind. |
+| `partial` | Content covers some areas; **specify which area is empty** in the Notes column. Slices touching empty areas fly-blind. |
+| `complete` | All planned areas covered for current product scope. Slices touching it consume the baseline normally. |
+
+A slice that consumes a folder marked `not_started`, `seeded`, or `partial-with-empty-target-area`
+must include a **Baseline-pending Acknowledgment** in its plan and flag every
+Product Delta against that folder as `proposed-against-no-baseline`.
+
+## Current Status
+
+| Folder | Status | Owner | Target sprint | Notes |
+|---|---|---|---|---|
+| 01-product | {{BASELINE_01_STATUS}} | {{BASELINE_01_OWNER}} | {{BASELINE_01_TARGET}} | {{BASELINE_01_NOTES}} |
+| 02-business | {{BASELINE_02_STATUS}} | {{BASELINE_02_OWNER}} | {{BASELINE_02_TARGET}} | {{BASELINE_02_NOTES}} |
+| 03-technical | {{BASELINE_03_STATUS}} | {{BASELINE_03_OWNER}} | {{BASELINE_03_TARGET}} | {{BASELINE_03_NOTES}} |
+| 05-releases | not_started | Planner | per-sprint | Populated at first sprint close that ships a feature. |
+
+## Update Triggers
+
+- A Product Foundation slice closes → owner updates the row for that folder.
+- A Product Delta lands and pushes a folder area from empty to filled → owner updates Notes.
+- Sprint close batches release-eligible deltas into 05-releases → row updates automatically.
+
+## Rules
+
+- Status is **conservative**: if any planned area is empty, mark `partial` with Notes naming the empty area. Do not mark `complete` until every planned area covers its intent.
+- An empty Notes field on a `partial` row is a harness defect — `partial` without scope is the same as `not_started` for downstream gate checks.
+- This file is read at every slice's Clarify stage. Stale rows cause downstream slices to consume stale baseline assumptions.

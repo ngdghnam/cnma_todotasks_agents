@@ -1,0 +1,90 @@
+# Roles, ownership, and transition authority.
+#
+# `owns`        : documents/artifacts the role is accountable for.
+# `may_advance` : transition domains the role's agent may PROPOSE and own
+#                 (matched against object-type + track + move in
+#                 .harness/transitions.yml). Outside its domain an agent may
+#                 draft a proposal but must defer confirmation to the owner.
+# See `coordination` for the parent-feature and cross-cutting rules.
+
+coordination:
+  coordinator_role: "Project Manager"
+  rules:
+    - "Only the coordinator may advance the parent `feature` lifecycle
+       (accepted->in-progress, in-progress->delivered, any->obsolete),
+       using evidence emitted by the BA/DEV/Delivery tracks."
+    - "Only the coordinator may open a BA rework (ready-for-build->rework),
+       because it changes a baseline DEV may already be building against."
+    - "A role-agent may PROPOSE only transitions inside its own
+       `may_advance` domain; outside it, defer confirmation to the owner."
+    - "Each agent writes only its own subtree of an IMPL record
+       (ba.* / dev.* / delivery.*). The coordinator owns the cross-cutting
+       fields (feature, sprint, derived_status)."
+
+roles:
+  Project Manager:
+    coordinator: true
+    owns:
+      - "Project Charter"
+      - "Project Plan"
+      - "Document Register"
+      - "Release Notes"
+      - "Go-live Checklist"
+    may_advance:
+      - "feature_implementation.delivery.*"
+      - "feature_implementation.ba.rework"   # coordinator authorizes the reopen
+      - "feature.*"                           # parent lifecycle — coordinator only
+      - "sprint.*"
+
+  Business Analyst:
+    owns:
+      - "Product Requirement"
+      - "Business Requirements"
+      - "User Stories"
+      - "Acceptance Criteria"
+      - "UAT Script"
+      - "User Guide"
+    may_advance:
+      - "feature_implementation.ba.*"
+      - "user_story.*"
+
+  Product Owner:
+    owns: []
+    may_advance:
+      - "feature.proposed->accepted"          # provides acceptance evidence
+      - "user_story.proposed->ready"
+
+  Tech Lead:
+    owns:
+      - "Solution Architecture"
+      - "Technical Design"
+      - "Data Model"
+      - "Integration Design"
+      - "Security Authorization"
+      - "Deployment Guide"
+      - "Runbook"
+      - "Admin Guide"
+    may_advance: []
+
+  Solution Architect:
+    owns: []
+    may_advance: []
+
+  Developer:
+    owns:
+      - "Implementation Notes"
+      - "Change Log"
+      - "Task files"
+      - "Session Handoffs"
+    may_advance:
+      - "feature_implementation.dev.*"
+
+  QA:
+    owns:
+      - "Test Strategy"
+      - "Test Cases"
+      - "Integration Test Cases"
+      - "Defect Log"
+      - "UAT Result"
+      - "Release Readiness"
+    may_advance: []

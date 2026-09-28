@@ -1,0 +1,12 @@
+schema_version: "1.0"
+contract_id: clarify-completion
+state: clarify
+objective: Resolve or explicitly govern functional clarifications before drafting.
+success_policy: all-required-checks-pass
+required_checks:
+  - { id: BA-CLARIFY-QUESTIONS, description: "Open questions have answers, owners, or explicit tracked disposition.", evidence_required: true }
+  - { id: BA-CLARIFY-AC, description: Acceptance criteria are observable and testable., evidence_required: true }
+  - { id: BA-CLARIFY-BOUNDARY, description: "Scope, exclusions, dependencies, and impacts are unambiguous enough to draft.", evidence_required: true }
+allowed_termination: [COMPLETED, COMPLETED_WITH_WARNINGS, BLOCKED, FAILED]
+warning_policy: Warnings may not leave an acceptance criterion materially ambiguous.
+

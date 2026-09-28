@@ -1,0 +1,23 @@
+schema_version: "1.0"
+schema: .agent/agents/harness/schemas/eval-rubric.schema.json
+agent: cap-implementation
+scale:
+  "0": missing-or-incorrect
+  "1": partial
+  "2": complete-with-evidence
+criteria:
+  - id: FORGE-CONTEXT
+    description: "Implementation uses the correct frozen baseline, plan, live state, scope, and current diff."
+  - id: FORGE-CAP
+    description: "CAP data, service, action, transaction, authorization, and integration boundaries are preserved."
+  - id: FORGE-SCOPE
+    description: "Changes remain minimal and inside effective permissions without unrelated refactoring."
+  - id: FORGE-TESTS
+    description: "Required positive, negative, authorization, and failure-path tests are implemented and evidenced."
+  - id: FORGE-LOOP
+    description: "Iterations update the ledger, make measurable progress, and terminate only by policy."
+  - id: FORGE-COMPLETION-INTEGRITY
+    description: "Completed statuses are impossible while any required atomic work, acceptance criterion, or completion check remains pending, blocked, or unaccounted."
+  - id: FORGE-TRUTH
+    description: "Validation, deviations, notes, and completion claims are factual and reproducible."
+

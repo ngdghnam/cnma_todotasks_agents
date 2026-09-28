@@ -1,0 +1,50 @@
+# Product Documentation
+
+> **Owner:** Product / BA Lead | **Audience:** End Users
+
+Welcome to the {{PROJECT_TITLE}} user documentation. This folder describes
+the product **as it ships to users** — what users see, do, and rely on.
+Plain language, no implementation detail.
+
+This is a **product-level** doc surface. Its content predates any project
+(see `docs/PRODUCT_BASELINE.md` for current status) and is updated through
+**Product Deltas** at slice close.
+
+## Product Roadmap
+
+- [`product-roadmap.md`](./product-roadmap.md) — canonical list of features that make up this product, with status and waves. **Read at every cold-start.** Updated by Product / BA Lead.
+
+## Getting Started
+
+- `getting-started.md` — what the product is, one-paragraph orientation
+- `quick-start.md` — first task a new user completes
+
+## User Manual
+
+Step-by-step guides for daily tasks. One file per user-facing capability.
+
+| Guide | Description |
+|-------|-------------|
+| — | *none yet* |
+
+## Administrator Guide
+
+For administrators managing the system.
+
+| Guide | Description |
+|-------|-------------|
+| — | *none yet* |
+
+## Help
+
+- `faq.md` — frequently asked questions
+
+## How this folder grows
+
+A Product Delta with target `01-product/*` is proposed at:
+- BA Publish stage (per `docs/04-project/harness/engineering/ba-workflow.md`)
+- Feature close stage (per `docs/04-project/harness/engineering/implementation-workflow.md`)
+
+The slice author writes the delta **fresh** for end-user audience — not by
+copying the product spec. Implementation language belongs in 03-technical;
+business rules belong in 02-business; user-facing how-to belongs here.

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reusable agent evaluation rubric",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "schema", "agent", "scale", "criteria"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "schema": { "const": ".agent/agents/harness/schemas/eval-rubric.schema.json" },
+    "agent": { "enum": ["cap-business-analysis", "cap-solution", "cap-implementation", "cap-quality"] },
+    "scale": { "type": "object", "required": ["0", "1", "2"] },
+    "criteria": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["id", "description"], "properties": { "id": { "type": "string" }, "description": { "type": "string" } } } }
+  }
+}
+

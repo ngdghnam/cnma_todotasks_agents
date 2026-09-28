@@ -1,0 +1,33 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Sprint Planning"
+type: object
+required: [sprint_planning]
+properties:
+  sprint_planning:
+    type: object
+    required: [active_sprint, candidate_stories, committed_stories, blocked_stories]
+    properties:
+      active_sprint:
+        oneOf:
+          - { type: "null" }
+          - type: object
+            required: [id, start_date, end_date, goal]
+            properties:
+              id: { type: string, pattern: "^SPRINT-[0-9]{3,}$" }
+              start_date: { type: string, format: date }
+              end_date: { type: string, format: date }
+              goal: { type: string }
+      candidate_stories:
+        type: array
+        items: { type: string, pattern: "^US-[0-9]{3,}$" }
+      committed_stories:
+        type: array
+        items: { type: string, pattern: "^US-[0-9]{3,}$" }
+      blocked_stories:
+        type: array
+        items:
+          type: object
+          required: [story, reason]
+          properties:
+            story: { type: string }
+            reason: { type: string }

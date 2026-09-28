@@ -1,0 +1,154 @@
+# Sprint 000 — Product Foundation
+
+> **Status:** proposed
+> **Created:** {{BOOTSTRAP_DATE}}
+> **Planner:** *fill in on commit*
+
+## Purpose
+
+Bootstrap-default sprint. The goal is to **predefine the product baseline**
+in `01-product/`, `02-business/`, `03-technical/` (and seed `05-releases/`)
+before any feature slice runs.
+
+This sprint is **mandatory** in spirit, **skippable** in practice:
+
+- **Greenfield product** (no existing docs in 01/02/03): treat the three
+  foundation slices below as required. AI Agent does not have enough
+  context to start feature work without them.
+- **Brownfield product** (existing docs you pasted in during bootstrap):
+  treat this sprint as a **warm-up**. The foundation slices verify the
+  pasted content is harness-shaped and update `PRODUCT_BASELINE.md` to
+  `complete` where appropriate.
+
+If the user chooses to skip Sprint 0 entirely, every subsequent feature
+slice that touches `01/02/03` flies blind (per the *Baseline-pending
+Acknowledgment* rule in `harness/engineering/implementation-workflow.md`).
+
+## Commitments
+
+| ID | Title | Owner hat | Target folder | Status |
+|---|---|---|---|---|
+| `product-foundation-01-product` | Predefine end-user documentation baseline **+ product-roadmap.md** | BA | `01-product/` | proposed |
+| `product-foundation-02-business` | Predefine business / process / data documentation baseline | BA | `02-business/` | proposed |
+| `product-foundation-03-technical` | Predefine technical / architecture / API documentation baseline | Tech Lead | `03-technical/` | proposed |
+
+Each commitment runs as a **Product Foundation slice** (a lightweight
+slice flavor — like a concept slice but the output lives in a
+product-level folder, not `harness/concepts/`).
+
+## Deliverables (per slice)
+
+Each slice closes **only when** every file below exists in the target
+folder with real content (no placeholder text, no `*fill at...*`
+markers). The list is the contract — Sprint 0 cannot close, and
+`PRODUCT_BASELINE.md` cannot flip to `complete` for the folder, until
+every box is checked.
+
+### `product-foundation-01-product` — Deliverables
+
+- [ ] `docs/01-product/README.md` — folder TOC matching the file list below
+- [ ] `docs/01-product/vision.md` — one-page problem / users / why-now
+- [ ] `docs/01-product/personas.md` — 3–5 personas with jobs-to-be-done
+- [ ] `docs/01-product/success-metrics.md` — KPIs that prove the product works
+- [ ] `docs/01-product/scope-and-non-goals.md` — what is in / explicitly out
+- [ ] `docs/01-product/product-roadmap.md` — Vision + Feature Catalog with `Target Release` (semver)
+- [ ] `docs/04-project/releases/v0.1-<slug>.md` — sections 1–4 derived from Foundation wave (see MANDATORY block below)
+
+### `product-foundation-02-business` — Deliverables
+
+- [ ] `docs/02-business/README.md` — folder TOC matching the file list below
+- [ ] `docs/02-business/glossary.md` — domain terms with single agreed definition
+- [ ] `docs/02-business/data-dictionary.md` — business entities and fields (no code)
+- [ ] `docs/02-business/roles-permissions.md` — role × capability matrix
+- [ ] `docs/02-business/business-rules.md` — cross-cutting rules independent of UI/code
+- [ ] `docs/02-business/process-flows/<main-flow>.md` — at least one end-to-end flow (BPMN or Mermaid)
+- [ ] `docs/02-business/requirements/use-cases/<main-flow>.md` — use cases + acceptance criteria for the main flow
+- [ ] `docs/02-business/state-machines/<entity>.md` — for every entity that has a lifecycle (skip with `N/A` note if none)
+- [ ] `docs/02-business/requirements/integrations.md` — external touchpoints (skip with `N/A` note if none)
+- [ ] `docs/02-business/requirements/compliance.md` — audit / regulatory obligations (skip with `N/A` note if none)
+
+### `product-foundation-03-technical` — Deliverables
+
+- [ ] `docs/03-technical/README.md` — folder TOC matching the file list below
+- [ ] `docs/03-technical/architecture/overview.md` — C4 Level 1–2 (context + container)
+- [ ] `docs/03-technical/architecture/tech-stack.md` — chosen stack + rationale
+- [ ] `docs/03-technical/architecture/domain-model.md` — entities + relationships (logical model)
+- [ ] `docs/03-technical/architecture/data-flow.md` — primary data movements
+- [ ] `docs/03-technical/architecture/nfr.md` — performance / scalability / availability targets
+- [ ] `docs/03-technical/architecture/security.md` — threat model + posture
+- [ ] `docs/03-technical/architecture/deployment.md` — runtime topology (e.g. MTA / CF / k8s)
+- [ ] `docs/03-technical/architecture/observability.md` — logging / metrics / tracing plan
+- [ ] `docs/03-technical/architecture/decisions/0001-<slug>.md` — first ADR (typically the stack decision)
+- [ ] `docs/03-technical/reference/api-reference.md` — API contract skeleton (OData / OpenAPI shape)
+- [ ] `docs/03-technical/reference/configuration.md` — env vars + config surfaces
+- [ ] `docs/03-technical/implementation/getting-started.md` — dev environment setup (verified to work)
+- [ ] `docs/03-technical/implementation/project-structure.md` — folder layout + ownership
+- [ ] `docs/03-technical/implementation/conventions.md` — coding conventions specific to this stack
+- [ ] `docs/03-technical/testing/strategy.md` — test pyramid (unit / integration / e2e)
+
+## Workflow (per slice)
+
+1. **Intake** — name the slice, declare which folder it targets, copy the deliverable list above into the slice's working notes.
+2. **Gather** — collect input from product owner / stakeholders / tech lead. Plain language. No code, no implementation.
+3. **Draft** — write each deliverable file. Skip-with-`N/A` entries get a 2-line file stating the reason.
+4. **Peer review** — confirm content is audience-correct (end-user vs BA vs developer), follows folder's content discipline, and every deliverable box is checked.
+5. **Publish** — user approval. Update `PRODUCT_BASELINE.md` row for the folder: status `complete` (every box checked, including `N/A`s with reason) or `partial` (some boxes still unchecked — Notes column must name which).
+
+A Product Foundation slice does **not** implement code. Its sole output
+is the predefined deliverable files above + the updated row in
+`PRODUCT_BASELINE.md`.
+
+## Sprint 0 Exit Gate
+
+Sprint 0 closes — and Sprint 1 may open — **only when**:
+
+- All three slices are at `complete` in `PRODUCT_BASELINE.md` (or explicitly `deferred` per Skip / Defer below with documented fly-blind acknowledgment).
+- The first release plan `docs/04-project/releases/v0.1-<slug>.md` exists with sections 1–4 populated.
+- The first product wiki build succeeded via `.agent/workflows/build-product-wiki.md` — `dist/wiki/index.html` renders without broken-link errors for filled deliverables.
+- Cold-start row 20 returns green.
+
+Developers starting any feature slice in Sprint 1 must be able to answer *"what does this product do, for whom, with what data, on which stack, deployed how?"* from `01/02/03` alone — without asking the user. If they cannot, Sprint 0 has not actually closed.
+
+### ⚠️ MANDATORY: product-foundation-01-product produces roadmap + first release plan
+
+> **This slice has TWO EXTRA MANDATORY OUTPUTS:**
+>
+> 1. **`docs/01-product/product-roadmap.md`** populated with Vision text
+>    **and** ≥1 real row in the Feature Catalog table (each row carrying
+>    a `Target Release` cell using semver, e.g. `v0.1-mvp`).
+> 2. **`docs/04-project/releases/v0.1-<slug>.md`** created with Sections
+>    1–4 filled (Release Goal, Why, Scope, Ship criteria), derived from
+>    Feature Catalog rows whose `Wave` is `Foundation`.
+>
+> **Enforcement (v2.2):** Cold-start row 20 marks `INVALID STATE` and
+> blocks all task work if `PRODUCT_BASELINE.md` lists 01-product as
+> `complete` while either artifact is missing. The ba-workflow Review
+> stage also checks both before allowing Publish.
+
+The product roadmap is the **canonical source** for which features the
+product needs. The first release plan turns that catalog into a
+deliverable unit. Planner uses both to populate `04-project/backlog.md`
+and to commit sprints; AI agent reads them when the user asks
+*"what's next?"*. A Sprint 0 that fills `01-product/` but skips either
+output leaves AI with no way to sequence future features — and the
+mechanical check above will block.
+
+## Skip / Defer
+
+If the user explicitly declines to run a foundation slice (e.g. business
+clarity pending stakeholder input):
+
+- Move the commitment row's Status to `deferred`.
+- Add a one-line reason in the Status column (e.g. `deferred: pending stakeholder kickoff on YYYY-MM-DD`).
+- Leave `PRODUCT_BASELINE.md` status at `not_started` for that folder.
+- Every downstream feature slice touching that folder flies blind with acknowledgment.
+
+## Retrospective
+
+*Filled at sprint close.*
+
+| Outcome | Notes |
+|---|---|
+| Baseline coverage achieved | — |
+| Slices deferred | — |
+| Reconciliation appointments scheduled | — |

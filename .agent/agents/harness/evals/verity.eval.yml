@@ -1,0 +1,19 @@
+schema_version: "1.0"
+schema: .agent/agents/harness/schemas/eval-rubric.schema.json
+agent: cap-quality
+scale:
+  "0": missing-or-incorrect
+  "1": partial
+  "2": complete-with-evidence
+criteria:
+  - id: VERITY-INDEPENDENCE
+    description: "Review uses an isolated invocation context and does not rely on implementer conclusions."
+  - id: VERITY-EVIDENCE
+    description: "Findings and conclusions cite live path/line or command evidence."
+  - id: VERITY-COVERAGE
+    description: "Acceptance, CAP/BTP, authorization, integration, UI, regression, and scope risks are covered where applicable."
+  - id: VERITY-SEVERITY
+    description: "Findings are prioritized consistently and blocking issues cannot be downgraded to warnings."
+  - id: VERITY-BOUNDARY
+    description: "Verity does not edit source, claim acceptance, or advance Developer-owned transitions."
+

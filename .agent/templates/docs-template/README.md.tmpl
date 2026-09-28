@@ -1,0 +1,54 @@
+# {{PROJECT_TITLE}} — Documentation
+
+> **Last Updated:** {{BOOTSTRAP_DATE}} | **Harness:** v{{HARNESS_VERSION}}
+
+## Documentation Layout (5-tier)
+
+This product uses a **5-tier doc layout** that separates audience and lifecycle:
+
+| Tier | Folder | Audience | Lifecycle | Owner hat |
+|---|---|---|---|---|
+| 1 | [Product](./01-product/) | End users | Lives across whole product lifetime; grows via Product Deltas | BA / Product |
+| 2 | [Business](./02-business/) | BAs, Product Owners | Lives across whole product lifetime; grows via Product Deltas | BA |
+| 3 | [Technical](./03-technical/) | Developers | Lives across whole product lifetime; grows via Product Deltas | Tech Lead |
+| 4 | [Project](./04-project/) | Internal (agent + dev team) | Per-project (sprints, slices, current work) | Planner / BA / Dev |
+| 5 | [Releases](./05-releases/) | All | Append-only per sprint close | Planner |
+
+## Status
+
+- [PRODUCT_BASELINE.md](./PRODUCT_BASELINE.md) — current predefine status of 01/02/03/05.
+
+## Two-tier mental model
+
+```
+   Product layer (long-lived, audience-facing)
+   ├── 01-product/    — "what the product does for users"
+   ├── 02-business/   — "how the business uses it"
+   ├── 03-technical/  — "how it is built and integrated"
+   └── 05-releases/   — "what shipped when"
+                  ▲
+                  │  promotes via Product Delta at slice close
+                  │
+   Project layer (short-lived, internal)
+   └── 04-project/   — "what we're working on right now"
+```
+
+A **project** is a bounded development cycle (quarter, sprint cycle).
+The **product** outlives the project. Each project consumes the product
+baseline as input and proposes deltas back as output.
+
+## Read order
+
+- **New to the product?** Start at [01-product/](./01-product/) for what
+  it does. Then [02-business/](./02-business/) for how the business uses it.
+- **About to write code?** Read [03-technical/](./03-technical/) for the
+  durable architecture, then [04-project/](./04-project/) for what's
+  currently in flight.
+- **Need to know what shipped?** [05-releases/](./05-releases/).
+
+## Sprint 0 (mandatory if greenfield, warm-up if brownfield)
+
+Bootstrap creates `04-project/sprints/sprint-000-product-foundation/`
+with three commitments to predefine 01/02/03 baselines. Run them before
+the first feature slice — or skip and acknowledge fly-blind per
+`04-project/harness/engineering/implementation-workflow.md`.

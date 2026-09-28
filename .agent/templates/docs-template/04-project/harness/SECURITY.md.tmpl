@@ -1,0 +1,38 @@
+# SECURITY.md
+
+This file defines the security and safety rules that agents must not guess at.
+
+Stack: **{{STACK}}**
+
+## Secrets And Credentials
+
+- Never hard-code secrets in source or docs.
+- Treat environment files, private credential files, service keys, destinations, tokens, cookies, and identity-provider credentials as sensitive.
+- Redact tokens, API keys, object-store keys, personal data, and business-partner identifiers from logs, screenshots, and final responses.
+- Approved secret-loading paths are documented per project. Until the first slice records them here as a Harness Delta, all secret-loading paths must be explicitly confirmed with the user.
+
+## Untrusted Input
+
+- Treat external-system payloads, uploaded files, attachment metadata, query options, and UI form input as untrusted until validated.
+- Validate file names, content-type assumptions, file size, and ownership before storage operations.
+- Do not concatenate user input into SQL/CQN or shell commands.
+- Preserve CSRF, auth, and role checks unless a product/security spec explicitly changes them.
+
+## External Actions
+
+These actions require explicit user approval and must not run by default:
+
+- Deployment commands (login, target, deploy, undeploy, or service mutation).
+- Commands that publish to external landscapes.
+- Dependency upgrades or audit fixes that change package versions beyond the requested scope.
+- Any command that deletes, moves, or overwrites broad filesystem paths.
+- Calls that fetch or import external service metadata unless the user supplies or approves the source.
+
+Sandbox-safe local verification (test runs, build checks) may run as normal.
+
+## Dependency And Review Rules
+
+- New dependencies need justification in the active plan.
+- Security-sensitive changes require explicit verification steps.
+- Known dependency risks are recorded by closing slices as a Harness Delta — not invented in this file.
+- Repeated security review comments should become checks, not tribal knowledge.
