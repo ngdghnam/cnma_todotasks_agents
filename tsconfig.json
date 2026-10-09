@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "node",
+      "@cap-js/cds-types"
+    ],
+    "noEmit": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "paths": {
+      "@sap/cds": [
+        "./node_modules/@cap-js/cds-types"
+      ],
+      "#cds-models/*": [
+        "./@cds-models/*"
+      ]
+    }
+  },
+  "include": [
+    "srv/**/*.ts",
+    "db/**/*.ts"
+  ]
+}
